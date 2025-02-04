@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Greek Bird</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <audio id="backgroundMusic" src="Zorbas_Dance.mp3" autoplay loop></audio>
+
+  <!-- Interface do jogo -->
+  <div id="background"></div>
+  <canvas id="gameCanvas"></canvas>
+  <div id="gameOverText">Game Over</div>
+  <div id="touchToStart">
+    <button id="startButton"> Start </button>
+  </div>
+  <div id="rankingText"></div>
+  <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
+  
+  <!-- Scripts (a ordem é importante) -->
+  <script type="module" src="js/firebase.js"></script>
+  <script type="module" src="js/game.js"></script>
+</body>
+</html>

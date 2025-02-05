@@ -125,11 +125,14 @@
             overflow-y: auto;
             border-radius: 10px;
             font-family: 'Gloock', serif;
-            font-size: 18px; /* Tamanho da fonte reduzido */
+            font-size: 18px;
+            /* Tamanho da fonte reduzido */
             color: #8B4513;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            width: 300px; /* Largura fixa para evitar quebra de linha */
-            text-align: center; /* Centraliza o texto */
+            width: 300px;
+            /* Largura fixa para evitar quebra de linha */
+            text-align: center;
+            /* Centraliza o texto */
         }
 
         #rankingButton {
@@ -231,13 +234,7 @@
 </head>
 
 <body>
-    <audio id="backgroundMusic" src="Zorbas_Dance.mp3" autoplay loop></audio>
-    <script>
-        window.addEventListener('click', () => {
-            const music = document.getElementById('backgroundMusic');
-            music.play();
-        });
-    </script>
+    <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
 
     <!-- Interface com usuário  -->
     <div id="background"></div>
@@ -248,7 +245,7 @@
     </div>
     <div id="rankingText"></div>
     <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
-    <button id="musicToggle" onclick="toggleMusic()">Música: ON</button>
+    <button id="musicToggle" onclick="toggleMusic()">Música: OFF</button>
 
     <!-- Caixa de seleção de personagem -->
     <div id="characterSelection">
@@ -437,17 +434,27 @@
             bird.velocity = bird.lift;
         });
 
+        // Função para alternar a música
         function toggleMusic() {
+            const musicButton = document.getElementById('musicToggle');
             const music = document.getElementById('backgroundMusic');
-            const musicToggle = document.getElementById('musicToggle');
+
             if (music.paused) {
                 music.play();
-                musicToggle.textContent = "Música: ON";
+                musicButton.textContent = "Música: ON";
+                musicPlaying = true;
             } else {
                 music.pause();
-                musicToggle.textContent = "Música: OFF";
+                musicButton.textContent = "Música: OFF";
+                musicPlaying = false;
             }
         }
+
+        // Começar com música parada
+        window.onload = () => {
+            document.getElementById('musicToggle').textContent = "Música: OFF";
+            musicPlaying = false;
+        };
     </script>
 </body>
 

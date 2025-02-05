@@ -112,17 +112,47 @@
 
         #rankingText {
             position: absolute;
-            top: 78%;
+            top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.8);
-            border: 2px solid black;
-            padding: 10px;
+            background: rgba(255, 223, 186, 0.9); /* Cor de mármore */
+            border: 4px solid #8B4513; /* Cor de bronze */
+            padding: 20px;
             display: none;
             z-index: 2;
             white-space: pre-line;
             max-height: 300px;
             overflow-y: auto;
+            border-radius: 10px;
+            font-family: 'Gloock', serif;
+            font-size: 20px;
+            color: #8B4513; /* Cor de bronze */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        #rankingText::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background-image: url('olympic_laurel.png'); /* Imagem de louros olímpicos */
+            background-size: cover;
+        }
+
+        #rankingText::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 50px;
+            height: 50px;
+            background-image: url('olympic_laurel.png'); /* Imagem de louros olímpicos */
+            background-size: cover;
+            transform: rotate(180deg);
         }
 
         #rankingButton {
@@ -226,6 +256,8 @@
         <select id="character">
             <option value="socrates.png">Sócrates</option>
             <option value="nietzsche.png">Nietzsche</option>
+            <option value="diogenes.png">Diógenes</option>
+            <option value="kant.png">Kant</option>
         </select>
         <button onclick="startGame()">Jogar</button>
     </div>

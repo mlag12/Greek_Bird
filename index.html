@@ -221,6 +221,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             text-align: center;
+            display: none; /* Inicialmente oculto */
         }
 
         #musicToggle:hover {
@@ -243,7 +244,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             text-align: center;
-            display: none;
+            display: none; /* Inicialmente oculto */
         }
 
         #characterButton:hover {
@@ -372,7 +373,8 @@
             document.getElementById('gameOverText').style.display = 'none';
             document.getElementById('rankingText').style.display = 'none';
             document.getElementById('rankingButton').style.display = 'none';
-            document.getElementById('characterButton').style.display = 'none';
+            document.getElementById('musicToggle').style.display = 'none'; // Oculta o botão de música
+            document.getElementById('characterButton').style.display = 'none'; // Oculta o botão de personagem
             animate();
         }
 
@@ -437,7 +439,8 @@
                 document.getElementById('rankingButton').style.display = 'block';
                 document.getElementById('gameOverText').style.display = 'block';
                 document.getElementById('touchToStart').style.display = 'block';
-                document.getElementById('characterButton').style.display = 'block';
+                document.getElementById('musicToggle').style.display = 'block'; // Exibe o botão de música
+                document.getElementById('characterButton').style.display = 'block'; // Exibe o botão de personagem
                 saveAndDisplayRanking();
             }
         }

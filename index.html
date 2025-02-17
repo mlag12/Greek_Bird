@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 
 <head>
     <script type="module">
-        // Configuração do Firebase (mantida igual)
+        // Firebase configuration
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, orderBy, query, limit, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -33,218 +33,495 @@
 
         window.saveScore = async function saveScore(name, score) {
             try {
-                const topScores = await getTopScores();
+                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
+
+                // Verifique se o novo score é maior que o menor no top 10
                 if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
                     await addDoc(collection(db, "scores"), {
                         name: name,
                         score: score
                     });
+                    console.log("Score saved!");
+                } else {
+                    console.log("Score too low to enter top 10.");
                 }
             } catch (error) {
-                console.error("Erro ao salvar score:", error);
+                console.error("Error saving score: ", error);
             }
         };
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Olympic Bird</title>
+    <title>Greek Bird</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Gloock&family=Almendra+SC&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
 
-        /* Estilos Gerais */
         body {
+            font-family: 'GFS Didot', serif;
             margin: 0;
+            padding: 0;
             overflow: hidden;
-            background: #f0e6d3;
         }
 
-        /* Estilo Olímpico Grego */
-        .olympic-modal {
-            font-family: 'Gloock', serif;
-            background: linear-gradient(45deg, #f4e3c3, #d4af37);
-            border: 5px solid #8b4513;
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(139, 69, 19, 0.5);
-            color: #5a2d0c;
-            padding: 30px;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 10000;
-            text-align: center;
-        }
-
-        .olympic-modal::before {
-            content: '';
+        #background {
             position: absolute;
-            top: -30px;
-            left: -30px;
-            right: -30px;
-            bottom: -30px;
-            background: url('https://img.icons8.com/ios-filled/100/8B4513/laurel-wreath.png') no-repeat center/contain;
-            pointer-events: none;
-            opacity: 0.3;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('background.jpeg');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
         }
 
-        .olympic-modal h2 {
-            font-size: 2.5em;
-            margin: 0 0 20px 0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        canvas {
+            display: block;
+            background-color: transparent;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
 
-        .olympic-input {
-            font-family: 'Gloock', serif;
-            font-size: 1.2em;
-            padding: 10px;
-            border: 3px solid #8b4513;
-            border-radius: 8px;
-            margin: 15px 0;
-            width: 200px;
-            background: #fff5e6;
-        }
-
-        .olympic-button {
-            font-family: 'Almendra SC', serif;
-            font-size: 1.3em;
-            padding: 10px 25px;
-            background: #8b4513;
-            color: #ffd700;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin: 10px;
-            text-transform: uppercase;
-        }
-
-        .olympic-button:hover {
-            background: #6b3410;
-            transform: scale(1.05);
-        }
-
-        /* Game Over Text */
         #gameOverText {
-            font-family: 'Almendra SC', serif;
-            font-size: 4em;
-            color: #8b4513;
-            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
-            position: fixed;
+            position: absolute;
             top: 30%;
             left: 50%;
             transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
             display: none;
-            z-index: 1000;
+            z-index: 2;
+            white-space: nowrap;
         }
 
-        /* Ranking */
+        #touchToStart {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            display: block;
+            z-index: 2;
+            white-space: nowrap;
+        }
+
         #rankingText {
-            font-family: 'Gloock', serif;
-            background: rgba(255, 240, 220, 0.95);
-            border: 4px solid #8b4513;
-            padding: 20px 40px;
-            border-radius: 15px;
-            box-shadow: 0 0 20px rgba(139, 69, 19, 0.4);
-            color: #5a2d0c;
-            font-size: 1.2em;
-            line-height: 1.5;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 223, 186, 0.9);
+            border: 4px solid #8B4513;
+            padding: 20px;
+            display: none;
+            z-index: 2;
+            white-space: pre-line;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            font-family: 'GFS Didot', serif;
+            font-size: 18px;
+            color: rgb(247, 151, 9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
         }
 
-        /* Demais estilos mantidos com pequenos ajustes */
-        #background { /* ... */ }
-        canvas { /* ... */ }
-        #touchToStart { /* ... */ }
-        #rankingButton { /* ... */ }
-        #startButton { /* ... */ }
-        #characterSelection { /* ... */ }
-        #musicToggle { /* ... */ }
-        #characterButton { /* ... */ }
+        #rankingButton {
+            position: absolute;
+            top: 40px;
+            left: 5px;
+            font-size: 20px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            background-color: #ffffff;
+            border: 2px solid #b8860b;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+        }
 
+        #rankingButton:hover {
+            background-color: #b8860b;
+            color: white;
+        }
+
+        #startButton {
+            font-size: 24px;
+            padding: 10px 20px;
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        #characterSelection {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #b8860b;
+        }
+
+        #characterSelection label {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        #characterSelection select {
+            font-size: 18px;
+            padding: 5px;
+            border: 2px solid #b8860b;
+            border-radius: 5px;
+        }
+
+        #characterSelection button {
+            font-size: 18px;
+            padding: 5px 10px;
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #characterSelection button:hover {
+            background-color: #a67c0a;
+        }
+
+        #musicToggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            background-color: #ffffff;
+            border: 2px solid #b8860b;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+            display: none; /* Inicialmente oculto */
+        }
+
+        #musicToggle:hover {
+            background-color: #b8860b;
+            color: white;
+        }
+
+        #characterButton {
+            position: absolute;
+            top: 60px; /* Posicionado abaixo do botão de música */
+            right: 10px; /* Alinhado à direita como o botão de música */
+            font-size: 20px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            background-color: #ffffff;
+            border: 2px solid #b8860b;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+            display: none; /* Inicialmente oculto */
+        }
+
+        #characterButton:hover {
+            background-color: #b8860b;
+            color: white;
+        }
+
+        /* Estilo da caixa de diálogo do Top 10 */
+        #top10Dialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 223, 186, 0.9);
+            border: 4px solid #8B4513;
+            padding: 20px;
+            display: none;
+            z-index: 2;
+            white-space: pre-line;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            font-family: 'GFS Didot', serif;
+            font-size: 18px;
+            color: rgb(247, 151, 9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
     <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
 
-    <!-- Interface Olímpica -->
+    <!-- Interface com usuário  -->
     <div id="background"></div>
     <canvas id="gameCanvas"></canvas>
-    
     <div id="gameOverText">Game Over</div>
-    
     <div id="touchToStart">
-        <button id="startButton">Começar Jogo</button>
+        <button id="startButton"> Start </button>
     </div>
-
-    <!-- Novo Modal Olímpico -->
-    <div id="top10Modal" class="olympic-modal" style="display:none;">
-        <h2>🏛️ Topo do Olimpo 🏛️</h2>
-        <p id="scoreDisplay"></p>
-        <input type="text" id="playerName" class="olympic-input" placeholder="Seu nome heroico" maxlength="15">
-        <button onclick="submitScore()" class="olympic-button">Entrar na História</button>
-    </div>
-
-    <!-- Ranking mantido com novo estilo -->
     <div id="rankingText"></div>
-    <button id="rankingButton" onclick="toggleRanking()">Tábuas da Glória</button>
-    <button id="musicToggle" onclick="toggleMusic()">♫ Música</button>
-    <button id="characterButton" onclick="showCharacterSelection()">Herói</button>
+    <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
+    <button id="musicToggle" onclick="toggleMusic()">Música: OFF</button>
+    <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
 
-    <!-- Seleção de Personagem Estilizada -->
-    <div id="characterSelection" class="olympic-modal">
-        <h2>Escolha seu Herói</h2>
-        <select id="character" class="olympic-input">
+    <!-- Caixa de seleção de personagem -->
+    <div id="characterSelection">
+        <label for="character">Escolha seu personagem:</label>
+        <select id="character">
             <option value="socrates.png">Sócrates</option>
             <option value="nietzsche.png">Nietzsche</option>
             <option value="diogenes.png">Diógenes</option>
             <option value="kant.png">Kant</option>
         </select>
-        <button onclick="startGame()" class="olympic-button">Iniciar Prova</button>
+        <button onclick="startGame()">Jogar</button>
     </div>
 
+    <!-- Caixa de diálogo do Top 10 -->
+    <div id="top10Dialog">
+        <p>Você entrou no Top 10!</p>
+        <input type="text" id="playerName" placeholder="Digite seu nome">
+        <button onclick="submitScore()">Enviar</button>
+    </div>
+    <!-- Final da Interface  -->
+
     <script>
-        // JavaScript modificado para o novo modal
+        // Lógica de Animação 
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const birdImage = new Image();
+        const columnImage = new Image();
+        columnImage.src = 'column.jpeg';
+
+        const bird = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 70,
+            height: 70,
+            gravity: 0.15,
+            lift: -6,
+            velocity: 1
+        };
+
+        const columns = [];
+        const columnWidth = 60;
+        const gapHeight = 300;
+        let score = 0;
+        let gameOver = false;
+        let gameStarted = false;
+        let rankingDisplayed = false;
+
+        function startGame() {
+            const characterSelect = document.getElementById('character');
+            birdImage.src = characterSelect.value;
+            document.getElementById('characterSelection').style.display = 'none';
+            document.getElementById('touchToStart').style.display = 'block';
+        }
+
+        function drawBird() {
+            ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height);
+        }
+
+        function drawColumn(column) {
+            ctx.drawImage(columnImage, column.x, column.gapY + gapHeight, columnWidth, canvas.height - column.gapY - gapHeight);
+            ctx.save();
+            ctx.scale(1, -1);
+            ctx.drawImage(columnImage, column.x, -column.gapY, columnWidth, column.gapY);
+            ctx.restore();
+        }
+
+        function updateColumns() {
+            for (let i = columns.length - 1; i >= 0; i--) {
+                const column = columns[i];
+                column.x -= 3;
+                if (column.x + columnWidth < 0) {
+                    columns.splice(i, 1);
+                    score++;
+                }
+                drawColumn(column);
+                if (
+                    bird.x + bird.width > column.x &&
+                    bird.x < column.x + columnWidth &&
+                    (bird.y < column.gapY || bird.y + bird.height > column.gapY + gapHeight)
+                ) {
+                    gameOver = true;
+                }
+            }
+
+            if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
+                const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
+                columns.push({ x: canvas.width, gapY });
+            }
+        }
+
+        function updateBird() {
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            if (bird.y + bird.height > canvas.height || bird.y < 0) {
+                gameOver = true;
+            }
+        }
+
+        function restartGame() {
+            bird.y = canvas.height / 2;
+            bird.velocity = 0;
+            columns.length = 0;
+            score = 0;
+            gameOver = false;
+            rankingDisplayed = false;
+            document.getElementById('gameOverText').style.display = 'none';
+            document.getElementById('rankingText').style.display = 'none';
+            document.getElementById('rankingButton').style.display = 'none';
+            document.getElementById('musicToggle').style.display = 'none'; // Oculta o botão de música
+            document.getElementById('characterButton').style.display = 'none'; // Oculta o botão de personagem
+            animate();
+        }
+
+        async function displayRanking() {
+            const topScores = await getTopScores();
+            let rankingText = "Top 10 Scores:\n";
+            topScores.forEach((entry, index) => {
+                rankingText += `${index + 1}. ${entry.name}: ${entry.score}\n`;
+            });
+
+            rankingText += `\nSua pontuação: ${score}`;
+            document.getElementById('rankingText').innerText = rankingText;
+
+            rankingDisplayed = true;
+        }
+
+        function toggleRanking() {
+            if (!rankingDisplayed) {
+                displayRanking();
+                document.getElementById('rankingText').style.display = 'block';
+            } else {
+                document.getElementById('rankingText').style.display = 'none';
+                rankingDisplayed = false;
+            }
+        }
+
         async function saveAndDisplayRanking() {
             const topScores = await getTopScores();
-            
+
             if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
-                document.getElementById('scoreDisplay').textContent = `Pontuação: ${score}`;
-                document.getElementById('top10Modal').style.display = 'block';
+                document.getElementById('top10Dialog').style.display = 'block';
             } else {
+                console.log("Score muito baixo para entrar no top 10.");
                 displayRanking();
             }
         }
 
         async function submitScore() {
             const playerName = document.getElementById('playerName').value;
-            if (playerName.trim()) {
-                await saveScore(playerName, score);
-                document.getElementById('top10Modal').style.display = 'none';
-                displayRanking();
-                document.getElementById('rankingText').style.display = 'block';
+            if (playerName) {
+                try {
+                    await saveScore(playerName, score);
+                    document.getElementById('top10Dialog').style.display = 'none';
+                    displayRanking();
+                } catch (error) {
+                    console.error("Erro ao salvar score:", error);
+                    alert("Ocorreu um erro ao salvar o score. Tente novamente.");
+                }
+            } else {
+                alert("Nome inválido! O score não foi salvo.");
             }
         }
 
-        // Função de exibição do ranking atualizada
-        async function displayRanking() {
-            const topScores = await getTopScores();
-            let rankingText = "🏆 Tábuas da Glória 🏆\n\n";
-            topScores.forEach((entry, index) => {
-                rankingText += `${index + 1}. ${entry.name.padEnd(15)} ${entry.score}\n`;
-            });
-            rankingText += `\nSua Pontuação: ${score}`;
-            document.getElementById('rankingText').innerText = rankingText;
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateBird();
+            drawBird();
+            updateColumns();
+
+            ctx.fillStyle = 'white';
+            ctx.font = '24px Arial';
+            ctx.fillText('Score: ' + score, 10, 30);
+
+            if (!gameOver) {
+                requestAnimationFrame(animate);
+            } else {
+                document.getElementById('rankingButton').style.display = 'block';
+                document.getElementById('gameOverText').style.display = 'block';
+                document.getElementById('touchToStart').style.display = 'block';
+                document.getElementById('musicToggle').style.display = 'block'; // Exibe o botão de música
+                document.getElementById('characterButton').style.display = 'block'; // Exibe o botão de personagem
+                saveAndDisplayRanking();
+            }
         }
 
-        // Demais funções mantidas com ajustes de texto
-        function toggleRanking() {
-            const ranking = document.getElementById('rankingText');
-            ranking.style.display = ranking.style.display === 'none' ? 'block' : 'none';
-            if (ranking.style.display === 'block') displayRanking();
+        document.getElementById('startButton').addEventListener('click', () => {
+            if (!gameStarted) {
+                gameStarted = true;
+                document.getElementById('touchToStart').style.display = 'none';
+                restartGame();
+            } else if (gameOver) {
+                restartGame();
+                document.getElementById('touchToStart').style.display = 'none';
+            }
+        });
+
+        canvas.addEventListener('click', (event) => {
+            bird.velocity = bird.lift;
+        });
+
+        // Função para alternar a música
+        function toggleMusic() {
+            const musicButton = document.getElementById('musicToggle');
+            const music = document.getElementById('backgroundMusic');
+
+            if (music.paused) {
+                music.play();
+                musicButton.textContent = "Música: ON";
+                musicPlaying = true;
+            } else {
+                music.pause();
+                musicButton.textContent = "Música: OFF";
+                musicPlaying = false;
+            }
         }
 
-        // Restante do código mantido com pequenos ajustes de texto
-        // ... (código do jogo permanece igual)
+        // Função para mostrar a seleção de personagem
+        function showCharacterSelection() {
+            document.getElementById('characterSelection').style.display = 'block';
+        }
+
+        // Começar com música parada
+        window.onload = () => {
+            document.getElementById('musicToggle').textContent = "Música: OFF";
+            musicPlaying = false;
+        };
     </script>
 </body>
+
 </html>

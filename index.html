@@ -2,9 +2,57 @@
 <html lang="en">
 
 <head>
+    <script type="module">
+        // Firebase configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, orderBy, query, limit, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlaMVBRQlulpV9MbVxasuGblF38KkY5f8",
+            authDomain: "greek-bird.firebaseapp.com",
+            projectId: "greek-bird",
+            storageBucket: "greek-bird.appspot.com",
+            messagingSenderId: "58870766246",
+            appId: "1:58870766246:web:6eb9c796ec11abd0e5f267",
+            measurementId: "G-PZBLWMH5W6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.getTopScores = async function getTopScores() {
+            const scoresRef = collection(db, "scores");
+            const q = query(scoresRef, orderBy("score", "desc"), limit(10));
+            const querySnapshot = await getDocs(q);
+            const topScores = [];
+            querySnapshot.forEach((doc) => {
+                topScores.push(doc.data());
+            });
+            return topScores;
+        }
+
+        window.saveScore = async function saveScore(name, score) {
+            try {
+                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
+
+                // Verifique se o novo score é maior que o menor no top 10
+                if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
+                    await addDoc(collection(db, "scores"), {
+                        name: name,
+                        score: score
+                    });
+                    console.log("Score saved!");
+                } else {
+                    console.log("Score too low to enter top 10.");
+                }
+            } catch (error) {
+                console.error("Error saving score: ", error);
+            }
+        };
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Top 10 Dialog</title>
+    <title>Greek Bird</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
 
@@ -12,18 +60,212 @@
             font-family: 'GFS Didot', serif;
             margin: 0;
             padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: rgba(0, 0, 0, 0.5); /* Fundo escurecido para simular o overlay */
+            overflow: hidden;
+        }
+
+        #background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('background.jpeg');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+        }
+
+        canvas {
+            display: block;
+            background-color: transparent;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #gameOverText {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            display: none;
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        #touchToStart {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            display: block;
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        #rankingText {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 223, 186, 0.9);
+            border: 4px solid #8B4513;
+            padding: 20px;
+            display: none;
+            z-index: 2;
+            white-space: pre-line;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            font-family: 'GFS Didot', serif;
+            font-size: 18px;
+            color: rgb(247, 151, 9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
+        }
+
+        #rankingButton {
+            position: absolute;
+            top: 40px;
+            left: 5px;
+            font-size: 20px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            background-color: #ffffff;
+            border: 2px solid #b8860b;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        #rankingButton:hover {
+            background-color: #b8860b;
+            color: white;
+        }
+
+        #startButton {
+            font-size: 24px;
+            padding: 10px 20px;
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        #characterSelection {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #b8860b;
+        }
+
+        #characterSelection label {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        #characterSelection select {
+            font-size: 18px;
+            padding: 5px;
+            border: 2px solid #b8860b;
+            border-radius: 5px;
+        }
+
+        #characterSelection button {
+            font-size: 18px;
+            padding: 5px 10px;
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #characterSelection button:hover {
+            background-color: #a67c0a;
+        }
+
+        #musicToggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            background-color: #ffffff;
+            border: 2px solid #b8860b;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+            display: none; /* Inicialmente oculto */
+        }
+
+        #musicToggle:hover {
+            background-color: #b8860b;
+            color: white;
+        }
+
+        #characterButton {
+            position: absolute;
+            top: 60px; /* Posicionado abaixo do botão de música */
+            right: 10px; /* Alinhado à direita como o botão de música */
+            font-size: 20px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            background-color: #ffffff;
+            border: 2px solid #b8860b;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+            display: none; /* Inicialmente oculto */
+        }
+
+        #characterButton:hover {
+            background-color: #b8860b;
+            color: white;
         }
 
         /* Estilo da caixa de diálogo do Top 10 */
         #top10Dialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             background: rgba(255, 223, 186, 0.9);
             border: 4px solid #8B4513;
             padding: 20px;
+            display: none;
+            z-index: 2;
+            white-space: pre-line;
+            max-height: 80vh;
+            overflow-y: auto;
             border-radius: 10px;
             font-family: 'GFS Didot', serif;
             font-size: 36px; /* Tamanho da fonte aumentado */
@@ -60,24 +302,249 @@
 </head>
 
 <body>
+    <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
+
+    <!-- Interface com usuário  -->
+    <div id="background"></div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="gameOverText">Game Over</div>
+    <div id="touchToStart">
+        <button id="startButton"> Start </button>
+    </div>
+    <div id="rankingText"></div>
+    <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
+    <button id="musicToggle" onclick="toggleMusic()">Música: OFF</button>
+    <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
+
+    <!-- Caixa de seleção de personagem -->
+    <div id="characterSelection">
+        <label for="character">Escolha seu personagem:</label>
+        <select id="character">
+            <option value="socrates.png">Sócrates</option>
+            <option value="nietzsche.png">Nietzsche</option>
+            <option value="diogenes.png">Diógenes</option>
+            <option value="kant.png">Kant</option>
+        </select>
+        <button onclick="startGame()">Jogar</button>
+    </div>
+
     <!-- Caixa de diálogo do Top 10 -->
     <div id="top10Dialog">
         <p>Você entrou no Top 10!</p>
         <input type="text" id="playerName" placeholder="Digite seu nome">
         <button onclick="submitScore()">Enviar</button>
     </div>
+    <!-- Final da Interface  -->
 
     <script>
-        // Função para enviar o score (simulação)
-        function submitScore() {
+        // Lógica de Animação 
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const birdImage = new Image();
+        const columnImage = new Image();
+        columnImage.src = 'column.jpeg';
+
+        const bird = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 70,
+            height: 70,
+            gravity: 0.15,
+            lift: -6,
+            velocity: 1
+        };
+
+        const columns = [];
+        const columnWidth = 60;
+        const gapHeight = 300;
+        let score = 0;
+        let gameOver = false;
+        let gameStarted = false;
+        let rankingDisplayed = false;
+
+        function startGame() {
+            const characterSelect = document.getElementById('character');
+            birdImage.src = characterSelect.value;
+            document.getElementById('characterSelection').style.display = 'none';
+            document.getElementById('touchToStart').style.display = 'block';
+        }
+
+        function drawBird() {
+            ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height);
+        }
+
+        function drawColumn(column) {
+            ctx.drawImage(columnImage, column.x, column.gapY + gapHeight, columnWidth, canvas.height - column.gapY - gapHeight);
+            ctx.save();
+            ctx.scale(1, -1);
+            ctx.drawImage(columnImage, column.x, -column.gapY, columnWidth, column.gapY);
+            ctx.restore();
+        }
+
+        function updateColumns() {
+            for (let i = columns.length - 1; i >= 0; i--) {
+                const column = columns[i];
+                column.x -= 3;
+                if (column.x + columnWidth < 0) {
+                    columns.splice(i, 1);
+                    score++;
+                }
+                drawColumn(column);
+                if (
+                    bird.x + bird.width > column.x &&
+                    bird.x < column.x + columnWidth &&
+                    (bird.y < column.gapY || bird.y + bird.height > column.gapY + gapHeight)
+                ) {
+                    gameOver = true;
+                }
+            }
+
+            if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
+                const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
+                columns.push({ x: canvas.width, gapY });
+            }
+        }
+
+        function updateBird() {
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            if (bird.y + bird.height > canvas.height || bird.y < 0) {
+                gameOver = true;
+            }
+        }
+
+        function restartGame() {
+            bird.y = canvas.height / 2;
+            bird.velocity = 0;
+            columns.length = 0;
+            score = 0;
+            gameOver = false;
+            rankingDisplayed = false;
+            document.getElementById('gameOverText').style.display = 'none';
+            document.getElementById('rankingText').style.display = 'none';
+            document.getElementById('rankingButton').style.display = 'none';
+            document.getElementById('musicToggle').style.display = 'none'; // Oculta o botão de música
+            document.getElementById('characterButton').style.display = 'none'; // Oculta o botão de personagem
+            animate();
+        }
+
+        async function displayRanking() {
+            const topScores = await getTopScores();
+            let rankingText = "Top 10 Scores:\n";
+            topScores.forEach((entry, index) => {
+                rankingText += `${index + 1}. ${entry.name}: ${entry.score}\n`;
+            });
+
+            rankingText += `\nSua pontuação: ${score}`;
+            document.getElementById('rankingText').innerText = rankingText;
+
+            rankingDisplayed = true;
+        }
+
+        function toggleRanking() {
+            if (!rankingDisplayed) {
+                displayRanking();
+                document.getElementById('rankingText').style.display = 'block';
+            } else {
+                document.getElementById('rankingText').style.display = 'none';
+                rankingDisplayed = false;
+            }
+        }
+
+        async function saveAndDisplayRanking() {
+            const topScores = await getTopScores();
+
+            if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
+                document.getElementById('top10Dialog').style.display = 'block';
+            } else {
+                console.log("Score muito baixo para entrar no top 10.");
+                displayRanking();
+            }
+        }
+
+        async function submitScore() {
             const playerName = document.getElementById('playerName').value;
             if (playerName) {
-                alert(`Score enviado com sucesso para: ${playerName}`);
-                // Aqui você pode adicionar a lógica para enviar o score para o servidor
+                try {
+                    await saveScore(playerName, score);
+                    document.getElementById('top10Dialog').style.display = 'none';
+                    displayRanking();
+                } catch (error) {
+                    console.error("Erro ao salvar score:", error);
+                    alert("Ocorreu um erro ao salvar o score. Tente novamente.");
+                }
             } else {
                 alert("Nome inválido! O score não foi salvo.");
             }
         }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateBird();
+            drawBird();
+            updateColumns();
+
+            ctx.fillStyle = 'white';
+            ctx.font = '24px Arial';
+            ctx.fillText('Score: ' + score, 10, 30);
+
+            if (!gameOver) {
+                requestAnimationFrame(animate);
+            } else {
+                document.getElementById('rankingButton').style.display = 'block';
+                document.getElementById('gameOverText').style.display = 'block';
+                document.getElementById('touchToStart').style.display = 'block';
+                document.getElementById('musicToggle').style.display = 'block'; // Exibe o botão de música
+                document.getElementById('characterButton').style.display = 'block'; // Exibe o botão de personagem
+                saveAndDisplayRanking();
+            }
+        }
+
+        document.getElementById('startButton').addEventListener('click', () => {
+            if (!gameStarted) {
+                gameStarted = true;
+                document.getElementById('touchToStart').style.display = 'none';
+                restartGame();
+            } else if (gameOver) {
+                restartGame();
+                document.getElementById('touchToStart').style.display = 'none';
+            }
+        });
+
+        canvas.addEventListener('click', (event) => {
+            bird.velocity = bird.lift;
+        });
+
+        // Função para alternar a música
+        function toggleMusic() {
+            const musicButton = document.getElementById('musicToggle');
+            const music = document.getElementById('backgroundMusic');
+
+            if (music.paused) {
+                music.play();
+                musicButton.textContent = "Música: ON";
+                musicPlaying = true;
+            } else {
+                music.pause();
+                musicButton.textContent = "Música: OFF";
+                musicPlaying = false;
+            }
+        }
+
+        // Função para mostrar a seleção de personagem
+        function showCharacterSelection() {
+            document.getElementById('characterSelection').style.display = 'block';
+        }
+
+        // Começar com música parada
+        window.onload = () => {
+            document.getElementById('musicToggle').textContent = "Música: OFF";
+            musicPlaying = false;
+        };
     </script>
 </body>
 

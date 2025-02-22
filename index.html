@@ -460,7 +460,9 @@
             const characterSelect = document.getElementById('character');
             birdImage.src = characterSelect.value;
             document.getElementById('characterSelection').style.display = 'none';
-            document.getElementById('touchToStart').style.display = 'block';
+            document.getElementById('touchToStart').style.display = 'none';
+            gameStarted = true;
+            restartGame();
         }
 
         function drawBird() {
@@ -517,10 +519,10 @@
             rankingDisplayed = false;
             document.getElementById('gameOverText').style.display = 'none';
             document.getElementById('rankingText').style.display = 'none';
-            document.getElementById('rankingButton').style.display = 'none';
-            document.getElementById('musicToggle').style.display = 'none'; // Oculta o botão de música
-            document.getElementById('characterButton').style.display = 'none'; // Oculta o botão de personagem
-            document.getElementById('backgroundButton').style.display = 'none'; // Oculta o botão de fundos
+            document.getElementById('rankingButton').style.display = 'block'; // Exibe o botão de ranking
+            document.getElementById('musicToggle').style.display = 'block'; // Exibe o botão de música
+            document.getElementById('characterButton').style.display = 'block'; // Exibe o botão de personagem
+            document.getElementById('backgroundButton').style.display = 'block'; // Exibe o botão de fundos
             animate();
         }
 
@@ -587,17 +589,25 @@
             if (!gameOver) {
                 requestAnimationFrame(animate);
             } else {
-                document.getElementById('rankingButton').style.display = 'block';
                 document.getElementById('gameOverText').style.display = 'block';
                 document.getElementById('touchToStart').style.display = 'block';
-                document.getElementById('musicToggle').style.display = 'block'; // Exibe o botão de música
-                document.getElementById('characterButton').style.display = 'block'; // Exibe o botão de personagem
-                document.getElementById('backgroundButton').style.display = 'block'; // Exibe o botão de fundos
                 saveAndDisplayRanking();
             }
         }
 
         document.getElementById('startButton').addEventListener('click', () => {
             if (!gameStarted) {
-                gameStarted = true;
-                document.getElementById('tou
+                startGame();
+            } else if (gameOver) {
+                restartGame();
+            }
+        });
+
+        canvas.addEventListener('click', (event) => {
+            bird.velocity = bird.lift;
+        });
+
+        // Função para alternar a música
+        function toggleMusic() {
+            const musicButton = document.getElementById('musicToggle');
+            const music = document.

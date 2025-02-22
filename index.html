@@ -177,6 +177,7 @@
             border-radius: 10px;
             text-align: center;
             border: 2px solid #b8860b;
+            display: none;
         }
 
         #characterSelection label {
@@ -599,4 +600,43 @@
             bird.velocity = bird.lift;
         });
 
-        // Função para alterna
+        // Função para alternar a música
+        function toggleMusic() {
+            const musicButton = document.getElementById('musicToggle');
+            const music = document.getElementById('backgroundMusic');
+
+            if (music.paused) {
+                music.play();
+                musicButton.textContent = "Música: ON";
+            } else {
+                music.pause();
+                musicButton.textContent = "Música: OFF";
+            }
+        }
+
+        // Função para mostrar a seleção de personagem
+        function showCharacterSelection() {
+            document.getElementById('characterSelection').style.display = 'block';
+        }
+
+        // Função para mostrar a seleção de fundos
+        function showBackgroundSelection() {
+            document.getElementById('backgroundSelection').style.display = 'block';
+        }
+
+        // Função para mudar o fundo
+        function changeBackground() {
+            const backgroundSelect = document.getElementById('background');
+            const backgroundDiv = document.getElementById('background');
+            backgroundDiv.style.backgroundImage = `url('${backgroundSelect.value}')`;
+            document.getElementById('backgroundSelection').style.display = 'none';
+        }
+
+        // Começar com música parada
+        window.onload = () => {
+            document.getElementById('musicToggle').textContent = "Música: OFF";
+        };
+    </script>
+</body>
+
+</html>

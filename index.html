@@ -365,6 +365,17 @@
         #backgroundSelection button:hover {
             background-color: #a67c0a;
         }
+
+        /* Estilo da prévia do fundo */
+        #backgroundPreview {
+            width: 100%;
+            height: 100px;
+            background-size: cover;
+            background-position: center;
+            margin-top: 10px;
+            border: 2px solid #b8860b;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
@@ -400,10 +411,11 @@
     <!-- Caixa de seleção de fundos -->
     <div id="backgroundSelection">
         <label for="background">Escolha o fundo:</label>
-        <select id="background">
+        <select id="background" onchange="updateBackgroundPreview()">
             <option value="background.jpeg">Ágora</option>
             <option value="background2.jpeg">Epicuro</option>
         </select>
+        <div id="backgroundPreview"></div>
         <button onclick="changeBackground()">Aplicar</button>
     </div>
 
@@ -622,6 +634,14 @@
         // Função para mostrar a seleção de fundos
         function showBackgroundSelection() {
             document.getElementById('backgroundSelection').style.display = 'block';
+            updateBackgroundPreview();
+        }
+
+        // Função para atualizar a prévia do fundo
+        function updateBackgroundPreview() {
+            const backgroundSelect = document.getElementById('background');
+            const backgroundPreview = document.getElementById('backgroundPreview');
+            backgroundPreview.style.backgroundImage = `url('${backgroundSelect.value}')`;
         }
 
         // Função para mudar o fundo

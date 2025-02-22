@@ -411,7 +411,8 @@
             const characterSelect = document.getElementById('character');
             birdImage.src = characterSelect.value;
             document.getElementById('characterSelection').style.display = 'none';
-            document.getElementById('touchToStart').style.display = 'block';
+            document.getElementById('touchToStart').style.display = 'none';
+            restartGame();
         }
 
         function drawBird() {

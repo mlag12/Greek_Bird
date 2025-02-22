@@ -298,6 +298,72 @@
         #top10Dialog button:hover {
             background-color: #a67c0a;
         }
+
+        /* Estilo do botão de fundos */
+        #backgroundButton {
+            position: absolute;
+            top: 110px; /* Posicionado abaixo do botão de personagem */
+            right: 10px; /* Alinhado à direita como os outros botões */
+            font-size: 20px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            background-color: #ffffff;
+            border: 2px solid #b8860b;
+            padding: 5px 10px;
+            cursor: pointer;
+            z-index: 2;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+            display: none; /* Inicialmente oculto */
+        }
+
+        #backgroundButton:hover {
+            background-color: #b8860b;
+            color: white;
+        }
+
+        /* Estilo da seleção de fundos */
+        #backgroundSelection {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #b8860b;
+            display: none;
+        }
+
+        #backgroundSelection label {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        #backgroundSelection select {
+            font-size: 18px;
+            padding: 5px;
+            border: 2px solid #b8860b;
+            border-radius: 5px;
+        }
+
+        #backgroundSelection button {
+            font-size: 18px;
+            padding: 5px 10px;
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #backgroundSelection button:hover {
+            background-color: #a67c0a;
+        }
     </style>
 </head>
 
@@ -315,6 +381,7 @@
     <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
     <button id="musicToggle" onclick="toggleMusic()">Música: OFF</button>
     <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
+    <button id="backgroundButton" onclick="showBackgroundSelection()">Fundos</button>
 
     <!-- Caixa de seleção de personagem -->
     <div id="characterSelection">
@@ -327,6 +394,16 @@
             <option value="olavo.png">Olavo</option> <!-- Novo personagem -->
         </select>
         <button onclick="startGame()">Jogar</button>
+    </div>
+
+    <!-- Caixa de seleção de fundos -->
+    <div id="backgroundSelection">
+        <label for="background">Escolha o fundo:</label>
+        <select id="background">
+            <option value="background.jpeg">Ágora</option>
+            <option value="background2.jpeg">Epicuro</option>
+        </select>
+        <button onclick="changeBackground()">Aplicar</button>
     </div>
 
     <!-- Caixa de diálogo do Top 10 -->
@@ -430,6 +507,7 @@
             document.getElementById('rankingButton').style.display = 'none';
             document.getElementById('musicToggle').style.display = 'none'; // Oculta o botão de música
             document.getElementById('characterButton').style.display = 'none'; // Oculta o botão de personagem
+            document.getElementById('backgroundButton').style.display = 'none'; // Oculta o botão de fundos
             animate();
         }
 
@@ -501,6 +579,7 @@
                 document.getElementById('touchToStart').style.display = 'block';
                 document.getElementById('musicToggle').style.display = 'block'; // Exibe o botão de música
                 document.getElementById('characterButton').style.display = 'block'; // Exibe o botão de personagem
+                document.getElementById('backgroundButton').style.display = 'block'; // Exibe o botão de fundos
                 saveAndDisplayRanking();
             }
         }
@@ -520,33 +599,4 @@
             bird.velocity = bird.lift;
         });
 
-        // Função para alternar a música
-        function toggleMusic() {
-            const musicButton = document.getElementById('musicToggle');
-            const music = document.getElementById('backgroundMusic');
-
-            if (music.paused) {
-                music.play();
-                musicButton.textContent = "Música: ON";
-                musicPlaying = true;
-            } else {
-                music.pause();
-                musicButton.textContent = "Música: OFF";
-                musicPlaying = false;
-            }
-        }
-
-        // Função para mostrar a seleção de personagem
-        function showCharacterSelection() {
-            document.getElementById('characterSelection').style.display = 'block';
-        }
-
-        // Começar com música parada
-        window.onload = () => {
-            document.getElementById('musicToggle').textContent = "Música: OFF";
-            musicPlaying = false;
-        };
-    </script>
-</body>
-
-</html>
+        // Função para alterna

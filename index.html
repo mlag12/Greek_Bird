@@ -316,19 +316,6 @@
             background-color: #a67c0a;
         }
 
-        /* Estilo da caixa de seleção para exibir/ocultar score */
-        #scoreToggle {
-            position: absolute;
-            top: 10px; /* Movido para cima */
-            left: 10px;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-family: 'GFS Didot', serif;
-            color: #b8860b;
-        }
-
         #scoreToggle input {
             width: 16px;
             height: 16px;
@@ -388,11 +375,6 @@
         <button onclick="submitScore()">Enviar</button>
     </div>
 
-    <!-- Caixa de seleção para exibir/ocultar score -->
-    <div id="scoreToggle">
-        <input type="checkbox" id="showScoreCheckbox" checked>
-        <label for="showScoreCheckbox">Exibir Score</label>
-    </div>
     <!-- Final da Interface  -->
 
     <script>
@@ -489,7 +471,6 @@
             rankingDisplayed = false;
             document.getElementById('gameOverText').style.display = 'none';
             document.getElementById('rankingText').style.display = 'none';
-            document.getElementById('scoreToggle').style.display = 'flex'; // Exibe a caixa de seleção novamente
             document.querySelector('.button-container').style.display = 'none'; // Oculta os botões ao reiniciar o jogo
             animate();
         }
@@ -562,7 +543,7 @@
                 document.getElementById('gameOverText').style.display = 'block';
                 document.getElementById('touchToStart').style.display = 'block';
                 document.querySelector('.button-container').style.display = 'flex'; // Exibe os botões após o Game Over
-                document.getElementById('scoreToggle').style.display = 'flex'; // Exibe a caixa de seleção após o Game Over
+                
                 saveAndDisplayRanking();
             }
         }

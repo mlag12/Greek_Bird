@@ -135,7 +135,7 @@
         #rankingButton {
             position: absolute;
             top: 40px;
-            left: 5px;
+            left: 150px; /* Posicionado entre Personagem e Fundos */
             font-size: 20px;
             font-family: 'GFS Didot', serif;
             color: #b8860b;
@@ -231,8 +231,8 @@
 
         #characterButton {
             position: absolute;
-            top: 60px; /* Posicionado abaixo do botão de música */
-            right: 10px; /* Alinhado à direita como o botão de música */
+            top: 40px;
+            left: 10px; /* Posicionado à esquerda */
             font-size: 20px;
             font-family: 'GFS Didot', serif;
             color: #b8860b;
@@ -254,8 +254,8 @@
 
         #backgroundButton {
             position: absolute;
-            top: 110px; /* Posicionado abaixo do botão de personagem */
-            right: 10px; /* Alinhado à direita como o botão de música */
+            top: 40px;
+            left: 290px; /* Posicionado à direita */
             font-size: 20px;
             font-family: 'GFS Didot', serif;
             color: #b8860b;
@@ -376,6 +376,24 @@
         #top10Dialog button:hover {
             background-color: #a67c0a;
         }
+
+        /* Estilo da caixa de seleção para exibir/ocultar score */
+        #scoreToggle {
+            position: absolute;
+            top: 80px;
+            left: 10px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+        }
+
+        #scoreToggle input {
+            width: 16px;
+            height: 16px;
+        }
     </style>
 </head>
 
@@ -426,6 +444,12 @@
         <input type="text" id="playerName" placeholder="Digite seu nome">
         <button onclick="submitScore()">Enviar</button>
     </div>
+
+    <!-- Caixa de seleção para exibir/ocultar score -->
+    <div id="scoreToggle">
+        <input type="checkbox" id="showScoreCheckbox" checked>
+        <label for="showScoreCheckbox">Exibir Score</label>
+    </div>
     <!-- Final da Interface  -->
 
     <script>
@@ -456,12 +480,15 @@
         let gameOver = false;
         let gameStarted = false;
         let rankingDisplayed = false;
+        let showScore = true; // Variável para controlar a exibição do score
 
         function startGame() {
             const characterSelect = document.getElementById('character');
             birdImage.src = characterSelect.value;
             document.getElementById('characterSelection').style.display = 'none';
             document.getElementById('touchToStart').style.display = 'block';
+            document.getElementById('scoreToggle').style.display = 'none'; // Oculta a caixa de seleção ao iniciar o jogo
+            showScore = document.getElementById('showScoreCheckbox').checked; // Atualiza a variável showScore
         }
 
         function drawBird() {
@@ -522,6 +549,7 @@
             document.getElementById('musicToggle').style.display = 'none'; // Oculta o botão de música
             document.getElementById('characterButton').style.display = 'none'; // Oculta o botão de personagem
             document.getElementById('backgroundButton').style.display = 'none'; // Oculta o botão de fundo
+            document.getElementById('scoreToggle').style.display = 'flex'; // Exibe a caixa de seleção novamente
             animate();
         }
 
@@ -581,9 +609,11 @@
             drawBird();
             updateColumns();
 
-            ctx.fillStyle = 'white';
-            ctx.font = '24px Arial';
-            ctx.fillText('Score: ' + score, 10, 30);
+            if (showScore) {
+                ctx.fillStyle = 'white';
+                ctx.font = '24px Arial';
+                ctx.fillText('Score: ' + score, 10, 30);
+            }
 
             if (!gameOver) {
                 requestAnimationFrame(animate);
@@ -594,6 +624,7 @@
                 document.getElementById('musicToggle').style.display = 'block'; // Exibe o botão de música
                 document.getElementById('characterButton').style.display = 'block'; // Exibe o botão de personagem
                 document.getElementById('backgroundButton').style.display = 'block'; // Exibe o botão de fundo
+                document.getElementById('scoreToggle').style.display = 'flex'; // Exibe a caixa de seleção novamente
                 saveAndDisplayRanking();
             }
         }

@@ -3,6 +3,7 @@
 
 <head>
     <script type="module">
+        // Firebase configuration
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, orderBy, query, limit, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -19,20 +20,33 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.getTopScores = async function () {
+        window.getTopScores = async function getTopScores() {
             const scoresRef = collection(db, "scores");
             const q = query(scoresRef, orderBy("score", "desc"), limit(10));
             const querySnapshot = await getDocs(q);
-            return querySnapshot.docs.map(doc => doc.data());
-        };
+            const topScores = [];
+            querySnapshot.forEach((doc) => {
+                topScores.push(doc.data());
+            });
+            return topScores;
+        }
 
-        window.saveScore = async function (name, score) {
-            const topScores = await getTopScores();
-            if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
-                await addDoc(collection(db, "scores"), { name, score });
-                console.log("Score saved!");
-            } else {
-                console.log("Score too low to enter top 10.");
+        window.saveScore = async function saveScore(name, score) {
+            try {
+                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
+
+                // Verifique se o novo score é maior que o menor no top 10
+                if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
+                    await addDoc(collection(db, "scores"), {
+                        name: name,
+                        score: score
+                    });
+                    console.log("Score saved!");
+                } else {
+                    console.log("Score too low to enter top 10.");
+                }
+            } catch (error) {
+                console.error("Error saving score: ", error);
             }
         };
     </script>
@@ -100,7 +114,16 @@
         const columnImage = new Image();
         columnImage.src = 'column.jpeg';
 
-        const bird = { x: 50, y: canvas.height / 2, width: 70, height: 70, gravity: 0.15, lift: -6, velocity: 1 };
+        const bird = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 70,
+            height: 70,
+            gravity: 0.15,
+            lift: -6,
+            velocity: 1
+        };
+
         const columns = [];
         const columnWidth = 60;
         const gapHeight = 300;
@@ -131,28 +154,36 @@
         }
 
         function updateColumns() {
-            columns.forEach((column, index) => {
+            for (let i = columns.length - 1; i >= 0; i--) {
+                const column = columns[i];
                 column.x -= 3;
                 if (column.x + columnWidth < 0) {
-                    columns.splice(index, 1);
+                    columns.splice(i, 1);
                     score++;
                 }
                 drawColumn(column);
-                if (bird.x + bird.width > column.x && bird.x < column.x + columnWidth &&
-                    (bird.y < column.gapY || bird.y + bird.height > column.gapY + gapHeight)) {
+                if (
+                    bird.x + bird.width > column.x &&
+                    bird.x < column.x + columnWidth &&
+                    (bird.y < column.gapY || bird.y + bird.height > column.gapY + gapHeight)
+                ) {
                     gameOver = true;
                 }
-            });
+            }
 
             if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
-                columns.push({ x: canvas.width, gapY: Math.random() * (canvas.height - gapHeight - 100) + 50 });
+                const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
+                columns.push({ x: canvas.width, gapY });
             }
         }
 
         function updateBird() {
             bird.velocity += bird.gravity;
             bird.y += bird.velocity;
-            if (bird.y + bird.height > canvas.height || bird.y < 0) gameOver = true;
+
+            if (bird.y + bird.height > canvas.height || bird.y < 0) {
+                gameOver = true;
+            }
         }
 
         function restartGame() {
@@ -178,8 +209,12 @@
 
         function toggleRanking() {
             const rankingText = document.getElementById('rankingText');
-            rankingText.style.display = rankingText.style.display === 'none' ? 'block' : 'none';
-            if (rankingText.style.display === 'block') displayRanking();
+            if (rankingText.style.display === 'none' || rankingText.style.display === '') {
+                displayRanking();
+                rankingText.style.display = 'block';
+            } else {
+                rankingText.style.display = 'none';
+            }
         }
 
         async function saveAndDisplayRanking() {

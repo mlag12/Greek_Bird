@@ -159,6 +159,7 @@
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             width: 200px; /* Largura aumentada */
+            align-items: center; /* Centraliza os itens horizontalmente */
         }
 
         .button-container button {
@@ -172,6 +173,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             text-align: center;
+            width: 100%; /* Faz os botões ocuparem a largura total */
         }
 
         .button-container button:hover {
@@ -333,7 +335,11 @@
             background-color: #a67c0a;
         }
 
+        /* Estilo da checkbox e label */
         #scoreToggle {
+            display: flex;
+            align-items: center; /* Alinha horizontalmente */
+            gap: 10px; /* Espaço entre o texto e a checkbox */
             margin-top: 10px;
         }
 
@@ -440,8 +446,6 @@
             birdImage.src = characterSelect.value;
             document.getElementById('characterSelection').style.display = 'none';
             document.getElementById('touchToStart').style.display = 'block';
-            document.getElementById('scoreToggle').style.display = 'none'; // Oculta a caixa de seleção ao iniciar o jogo
-            document.querySelector('.button-container').style.display = 'none'; // Oculta os botões ao iniciar o jogo
             showScore = document.getElementById('showScoreCheckbox').checked; // Atualiza a variável showScore
         }
 
@@ -499,7 +503,6 @@
             rankingDisplayed = false;
             document.getElementById('gameOverText').style.display = 'none';
             document.getElementById('rankingText').style.display = 'none';
-            document.querySelector('.button-container').style.display = 'none'; // Oculta os botões ao reiniciar o jogo
             animate();
         }
 
@@ -570,8 +573,6 @@
             } else {
                 document.getElementById('gameOverText').style.display = 'block';
                 document.getElementById('touchToStart').style.display = 'block';
-                document.querySelector('.button-container').style.display = 'flex'; // Exibe os botões após o Game Over
-                
                 saveAndDisplayRanking();
             }
         }

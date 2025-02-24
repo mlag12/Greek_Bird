@@ -445,7 +445,7 @@
             const characterSelect = document.getElementById('character');
             birdImage.src = characterSelect.value;
             document.getElementById('characterSelection').style.display = 'none';
-            document.getElementById('touchToStart').style.display = 'block';
+            document.getElementById('touchToStart').style.display = 'none';
             showScore = document.getElementById('showScoreCheckbox').checked; // Atualiza a variável showScore
 
             // Fecha a caixa do menu se estiver aberta
@@ -453,6 +453,10 @@
             if (buttonContainer.style.display === 'flex') {
                 buttonContainer.style.display = 'none';
             }
+
+            // Inicia o jogo
+            gameStarted = true;
+            restartGame();
         }
 
         function drawBird() {

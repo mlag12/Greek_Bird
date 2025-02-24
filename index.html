@@ -132,10 +132,19 @@
             text-align: center;
         }
 
-        #rankingButton {
+        /* Estilo dos botões no canto superior direito */
+        .button-container {
             position: absolute;
-            top: 40px;
-            left: 150px; /* Posicionado entre Personagem e Fundos */
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 2;
+            display: none; /* Inicialmente oculto */
+        }
+
+        .button-container button {
             font-size: 20px;
             font-family: 'GFS Didot', serif;
             color: #b8860b;
@@ -143,13 +152,12 @@
             border: 2px solid #b8860b;
             padding: 5px 10px;
             cursor: pointer;
-            z-index: 2;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             text-align: center;
         }
 
-        #rankingButton:hover {
+        .button-container button:hover {
             background-color: #b8860b;
             color: white;
         }
@@ -204,75 +212,6 @@
 
         #characterSelection button:hover {
             background-color: #a67c0a;
-        }
-
-        #musicToggle {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 20px;
-            font-family: 'GFS Didot', serif;
-            color: #b8860b;
-            background-color: #ffffff;
-            border: 2px solid #b8860b;
-            padding: 5px 10px;
-            cursor: pointer;
-            z-index: 2;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            text-align: center;
-            display: none; /* Inicialmente oculto */
-        }
-
-        #musicToggle:hover {
-            background-color: #b8860b;
-            color: white;
-        }
-
-        #characterButton {
-            position: absolute;
-            top: 40px;
-            left: 10px; /* Posicionado à esquerda */
-            font-size: 20px;
-            font-family: 'GFS Didot', serif;
-            color: #b8860b;
-            background-color: #ffffff;
-            border: 2px solid #b8860b;
-            padding: 5px 10px;
-            cursor: pointer;
-            z-index: 2;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            text-align: center;
-            display: none; /* Inicialmente oculto */
-        }
-
-        #characterButton:hover {
-            background-color: #b8860b;
-            color: white;
-        }
-
-        #backgroundButton {
-            position: absolute;
-            top: 40px;
-            left: 290px; /* Posicionado à direita */
-            font-size: 20px;
-            font-family: 'GFS Didot', serif;
-            color: #b8860b;
-            background-color: #ffffff;
-            border: 2px solid #b8860b;
-            padding: 5px 10px;
-            cursor: pointer;
-            z-index: 2;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            text-align: center;
-            display: none; /* Inicialmente oculto */
-        }
-
-        #backgroundButton:hover {
-            background-color: #b8860b;
-            color: white;
         }
 
         #backgroundSelection {
@@ -408,10 +347,14 @@
         <button id="startButton"> Start </button>
     </div>
     <div id="rankingText"></div>
-    <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
-    <button id="musicToggle" onclick="toggleMusic()">Música: OFF</button>
-    <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
-    <button id="backgroundButton" onclick="showBackgroundSelection()">Fundos</button>
+
+    <!-- Botões no canto superior direito -->
+    <div class="button-container">
+        <button id="musicToggle" onclick="toggleMusic()">Música: OFF</button>
+        <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
+        <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
+        <button id="backgroundButton" onclick="showBackgroundSelection()">Fundos</button>
+    </div>
 
     <!-- Caixa de seleção de personagem -->
     <div id="characterSelection">
@@ -488,6 +431,7 @@
             document.getElementById('characterSelection').style.display = 'none';
             document.getElementById('touchToStart').style.display = 'block';
             document.getElementById('scoreToggle').style.display = 'none'; // Oculta a caixa de seleção ao iniciar o jogo
+            document.querySelector('.button-container').style.display = 'none'; // Oculta os botões ao iniciar o jogo
             showScore = document.getElementById('showScoreCheckbox').checked; // Atualiza a variável showScore
         }
 
@@ -545,11 +489,8 @@
             rankingDisplayed = false;
             document.getElementById('gameOverText').style.display = 'none';
             document.getElementById('rankingText').style.display = 'none';
-            document.getElementById('rankingButton').style.display = 'none';
-            document.getElementById('musicToggle').style.display = 'none'; // Oculta o botão de música
-            document.getElementById('characterButton').style.display = 'none'; // Oculta o botão de personagem
-            document.getElementById('backgroundButton').style.display = 'none'; // Oculta o botão de fundo
             document.getElementById('scoreToggle').style.display = 'flex'; // Exibe a caixa de seleção novamente
+            document.querySelector('.button-container').style.display = 'none'; // Oculta os botões ao reiniciar o jogo
             animate();
         }
 
@@ -618,13 +559,10 @@
             if (!gameOver) {
                 requestAnimationFrame(animate);
             } else {
-                document.getElementById('rankingButton').style.display = 'block';
                 document.getElementById('gameOverText').style.display = 'block';
                 document.getElementById('touchToStart').style.display = 'block';
-                document.getElementById('musicToggle').style.display = 'block'; // Exibe o botão de música
-                document.getElementById('characterButton').style.display = 'block'; // Exibe o botão de personagem
-                document.getElementById('backgroundButton').style.display = 'block'; // Exibe o botão de fundo
-                document.getElementById('scoreToggle').style.display = 'flex'; // Exibe a caixa de seleção novamente
+                document.querySelector('.button-container').style.display = 'flex'; // Exibe os botões após o Game Over
+                document.getElementById('scoreToggle').style.display = 'flex'; // Exibe a caixa de seleção após o Game Over
                 saveAndDisplayRanking();
             }
         }

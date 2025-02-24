@@ -132,16 +132,32 @@
             text-align: center;
         }
 
-        /* Estilo dos botões no canto superior direito */
-        .button-container {
+        /* Estilo do ícone de Menu */
+        #menuIcon {
             position: absolute;
             top: 10px;
+            right: 10px;
+            font-size: 30px;
+            color: #b8860b;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* Estilo da caixa de botões */
+        .button-container {
+            position: absolute;
+            top: 50px;
             right: 10px;
             display: flex;
             flex-direction: column;
             gap: 10px;
             z-index: 2;
             display: none; /* Inicialmente oculto */
+            background: rgba(255, 223, 186, 0.9);
+            border: 4px solid #8B4513;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
         }
 
         .button-container button {
@@ -316,9 +332,13 @@
             background-color: #a67c0a;
         }
 
-        #scoreToggle input {
-            width: 16px;
-            height: 16px;
+        #scoreToggle {
+            margin-top: 10px;
+        }
+
+        #scoreToggle label {
+            font-size: 18px;
+            color: #b8860b;
         }
     </style>
 </head>
@@ -335,12 +355,19 @@
     </div>
     <div id="rankingText"></div>
 
+    <!-- Ícone de Menu -->
+    <div id="menuIcon" onclick="toggleMenu()">☰</div>
+
     <!-- Botões no canto superior direito -->
     <div class="button-container">
         <button id="musicToggle" onclick="toggleMusic()">Música: OFF</button>
         <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
         <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
         <button id="backgroundButton" onclick="showBackgroundSelection()">Fundos</button>
+        <div id="scoreToggle">
+            <label for="showScoreCheckbox">Mostrar Score:</label>
+            <input type="checkbox" id="showScoreCheckbox" checked onchange="toggleScoreDisplay()">
+        </div>
     </div>
 
     <!-- Caixa de seleção de personagem -->
@@ -603,6 +630,21 @@
             const backgroundDiv = document.getElementById('background');
             backgroundDiv.style.backgroundImage = `url('${backgroundSelect.value}')`;
             document.getElementById('backgroundSelection').style.display = 'none';
+        }
+
+        // Função para alternar a exibição do menu
+        function toggleMenu() {
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
+                buttonContainer.style.display = 'flex';
+            } else {
+                buttonContainer.style.display = 'none';
+            }
+        }
+
+        // Função para alternar a exibição do score
+        function toggleScoreDisplay() {
+            showScore = document.getElementById('showScoreCheckbox').checked;
         }
 
         // Começar com música parada

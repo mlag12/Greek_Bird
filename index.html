@@ -530,12 +530,12 @@
         }
 
         function toggleRanking() {
-            if (!rankingDisplayed) {
+            const rankingText = document.getElementById('rankingText');
+            if (rankingText.style.display === 'none' || rankingText.style.display === '') {
                 displayRanking();
-                document.getElementById('rankingText').style.display = 'block';
+                rankingText.style.display = 'block';
             } else {
-                document.getElementById('rankingText').style.display = 'none';
-                rankingDisplayed = false;
+                rankingText.style.display = 'none';
             }
         }
 

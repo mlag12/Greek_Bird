@@ -3,7 +3,7 @@
 
 <head>
     <script type="module">
-        // Firebase configuration
+        // Configuração do Firebase (mantido igual)
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, orderBy, query, limit, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
@@ -33,9 +33,7 @@
 
         window.saveScore = async function saveScore(name, score) {
             try {
-                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
-
-                // Verifique se o novo score é maior que o menor no top 10
+                const topScores = await getTopScores();
                 if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
                     await addDoc(collection(db, "scores"), {
                         name: name,
@@ -445,7 +443,7 @@
 <body>
     <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
 
-    <!-- Interface com usuário  -->
+    <!-- Interface com usuário (mantida igual) -->
     <div id="background"></div>
     <canvas id="gameCanvas"></canvas>
     <div id="gameOverText">Game Over</div>
@@ -453,11 +451,7 @@
         <button id="startButton"> Start </button>
     </div>
     <div id="rankingText"></div>
-
-    <!-- Ícone de Menu -->
     <div id="menuIcon" onclick="toggleMenu()">☰</div>
-
-    <!-- Botões no canto superior direito -->
     <div class="button-container">
         <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
         <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
@@ -477,8 +471,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Caixa de seleção de personagem -->
     <div id="characterSelection">
         <label for="character">Escolha seu personagem:</label>
         <select id="character">
@@ -490,8 +482,6 @@
         </select>
         <button onclick="startGame()">Jogar</button>
     </div>
-
-    <!-- Caixa de seleção de fundo -->
     <div id="backgroundSelection">
         <label for="backgroundSelect">Escolha o fundo:</label>
         <select id="backgroundSelect" onchange="updateBackgroundPreview()">
@@ -503,16 +493,12 @@
         <div id="backgroundPreview"></div>
         <button onclick="applyBackground()">OK</button>
     </div>
-
-    <!-- Caixa de diálogo do Top 10 -->
     <div id="top10Dialog">
         <p>Você entrou no Top 10!</p>
         <p>Sua pontuação: <span id="top10Score"></span></p>
         <input type="text" id="playerName" placeholder="Digite seu nome">
         <button onclick="submitScore()">Enviar</button>
     </div>
-
-    <!-- Final da Interface  -->
 
     <script>
         // Lógica de Animação 
@@ -547,15 +533,15 @@
 
         // Efeitos de morcegos
         const bats = [];
-        const batImage = new Image();
-        batImage.src = 'bat.png'; // Imagem do morcego
+        let wingAngle = 0; // Ângulo das asas para animação
+        const wingSpeed = 0.1; // Velocidade do movimento das asas
 
         function createBat(x, y) {
             for (let i = 0; i < 10; i++) { // Cria vários morcegos
                 bats.push({
                     x: x + Math.random() * 20 - 10, // Posição aleatória ao redor do personagem
                     y: y,
-                    size: Math.random() * 20 + 10,
+                    size: Math.random() * 40 + 30, // Tamanho maior
                     speedX: (Math.random() - 0.5) * 4, // Movimento horizontal aleatório
                     speedY: (Math.random() - 0.5) * 4,
                     rotation: Math.random() * Math.PI * 2 // Rotação aleatória
@@ -563,17 +549,44 @@
             }
         }
 
-        function drawBat(x, y, size, rotation) {
+        function drawBat(x, y, size) {
             ctx.save();
             ctx.translate(x, y);
-            ctx.rotate(rotation);
-            ctx.drawImage(batImage, -size / 2, -size / 2, size, size);
+
+            // Corpo do morcego
+            ctx.beginPath();
+            ctx.arc(0, 0, size / 4, 0, Math.PI * 2);
+            ctx.fillStyle = '#333';
+            ctx.fill();
+
+            // Asas do morcego
+            ctx.strokeStyle = '#333';
+            ctx.lineWidth = 3;
+
+            // Asa esquerda
+            ctx.save();
+            ctx.rotate(-wingAngle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.quadraticCurveTo(-size / 2, -size / 4, -size, 0);
+            ctx.stroke();
+            ctx.restore();
+
+            // Asa direita
+            ctx.save();
+            ctx.rotate(wingAngle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.quadraticCurveTo(size / 2, -size / 4, size, 0);
+            ctx.stroke();
+            ctx.restore();
+
             ctx.restore();
         }
 
         function drawBats() {
             bats.forEach((bat, index) => {
-                drawBat(bat.x, bat.y, bat.size, bat.rotation);
+                drawBat(bat.x, bat.y, bat.size);
 
                 // Atualiza a posição do morcego
                 bat.x += bat.speedX;
@@ -584,6 +597,12 @@
                     bats.splice(index, 1);
                 }
             });
+
+            // Atualiza o ângulo das asas para animação
+            wingAngle += wingSpeed;
+            if (wingAngle > Math.PI / 4 || wingAngle < -Math.PI / 4) {
+                wingSpeed *= -1; // Inverte a direção do movimento das asas
+            }
         }
 
         function startGame() {

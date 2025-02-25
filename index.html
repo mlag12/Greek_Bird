@@ -385,6 +385,10 @@
                 <input type="checkbox" id="musicCheckbox" onchange="toggleMusic()">
                 <label for="musicCheckbox">Música</label>
             </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="3dCheckbox" onchange="toggle3D()">
+                <label for="3dCheckbox">3D</label>
+            </div>
         </div>
     </div>
 
@@ -424,6 +428,7 @@
 
     <!-- Final da Interface  -->
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Lógica de Animação 
         const canvas = document.getElementById('gameCanvas');
@@ -453,6 +458,60 @@
         let gameStarted = false;
         let rankingDisplayed = false;
         let showScore = true; // Variável para controlar a exibição do score
+        let is3D = false; // Variável para controlar o modo 3D
+
+        // Configuração da cena 3D
+        let scene, camera, renderer, bird3D, columns3D = [];
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
+            camera.position.z = 5;
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(canvas.width, canvas.height);
+            document.body.appendChild(renderer.domElement);
+
+            const light = new THREE.DirectionalLight(0xffffff, 1);
+            light.position.set(0, 1, 1).normalize();
+            scene.add(light);
+
+            // Criar o pássaro 3D
+            const birdGeometry = new THREE.BoxGeometry(1, 1, 1);
+            const birdMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            bird3D = new THREE.Mesh(birdGeometry, birdMaterial);
+            scene.add(bird3D);
+
+            // Criar colunas 3D
+            const columnGeometry = new THREE.BoxGeometry(1, 10, 1);
+            const columnMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff });
+
+            for (let i = 0; i < 5; i++) {
+                const column = new THREE.Mesh(columnGeometry, columnMaterial);
+                column.position.x = i * 5;
+                column.position.y = Math.random() * 10 - 5;
+                columns3D.push(column);
+                scene.add(column);
+            }
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+
+            // Atualizar posição do pássaro 3D
+            bird3D.position.y = bird.y / 100;
+
+            // Atualizar posição das colunas 3D
+            columns3D.forEach((column, index) => {
+                column.position.x -= 0.1;
+                if (column.position.x < -10) {
+                    column.position.x = 10;
+                    column.position.y = Math.random() * 10 - 5;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
 
         function startGame() {
             const characterSelect = document.getElementById('character');
@@ -533,10 +592,10 @@
             const topScores = await getTopScores();
             let rankingText = "Top 10 Scores:\n";
             topScores.forEach((entry, index) => {
-                rankingText += `${index + 1}. ${entry.name}: ${entry.score}\n`;
+                rankingText += ${index + 1}. ${entry.name}: ${entry.score}\n;
             });
 
-            rankingText += `\nSua pontuação: ${score}`;
+            rankingText += \nSua pontuação: ${score};
             document.getElementById('rankingText').innerText = rankingText;
 
             rankingDisplayed = true;
@@ -649,14 +708,14 @@
         function updateBackgroundPreview() {
             const backgroundSelect = document.getElementById('backgroundSelect');
             const backgroundPreview = document.getElementById('backgroundPreview');
-            backgroundPreview.style.backgroundImage = `url('${backgroundSelect.value}')`;
+            backgroundPreview.style.backgroundImage = url('${backgroundSelect.value}');
         }
 
         // Função para aplicar o fundo selecionado
         function applyBackground() {
             const backgroundSelect = document.getElementById('backgroundSelect');
             const backgroundDiv = document.getElementById('background');
-            backgroundDiv.style.backgroundImage = `url('${backgroundSelect.value}')`;
+            backgroundDiv.style.backgroundImage = url('${backgroundSelect.value}');
             document.getElementById('backgroundSelection').style.display = 'none';
         }
 
@@ -673,6 +732,20 @@
         // Função para alternar a exibição do score
         function toggleScoreDisplay() {
             showScore = document.getElementById('showScoreCheckbox').checked;
+        }
+
+        // Função para alternar o modo 3D
+        function toggle3D() {
+            is3D = document.getElementById('3dCheckbox').checked;
+            if (is3D) {
+                init3D();
+                animate3D();
+            } else {
+                // Remover a cena 3D e voltar para o modo 2D
+                if (renderer) {
+                    document.body.removeChild(renderer.domElement);
+                }
+            }
         }
 
         // Começar com música parada

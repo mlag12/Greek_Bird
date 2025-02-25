@@ -119,7 +119,7 @@
             border: 4px solid #8B4513;
             padding: 20px;
             display: none;
-            z-index: 3; /* Z-index maior para sobrepor o menu */
+            z-index: 3;
             white-space: pre-line;
             max-height: 80vh;
             overflow-y: auto;
@@ -132,7 +132,6 @@
             text-align: center;
         }
 
-        /* Estilo do ícone de Menu */
         #menuIcon {
             position: absolute;
             top: 10px;
@@ -143,7 +142,6 @@
             z-index: 2;
         }
 
-        /* Estilo da caixa de botões */
         .button-container {
             position: absolute;
             top: 50px;
@@ -152,14 +150,14 @@
             flex-direction: column;
             gap: 10px;
             z-index: 2;
-            display: none; /* Inicialmente oculto */
+            display: none;
             background: rgba(255, 223, 186, 0.9);
             border: 4px solid #8B4513;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            width: 200px; /* Largura aumentada */
-            align-items: center; /* Centraliza os itens horizontalmente */
+            width: 200px;
+            align-items: center;
         }
 
         .button-container button {
@@ -173,7 +171,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             text-align: center;
-            width: 100%; /* Faz os botões ocuparem a largura total */
+            width: 100%;
         }
 
         .button-container button:hover {
@@ -245,8 +243,8 @@
             text-align: center;
             border: 2px solid #b8860b;
             display: none;
-            width: 80%; /* Largura aumentada */
-            max-width: 600px; /* Largura máxima */
+            width: 80%;
+            max-width: 600px;
         }
 
         #backgroundSelection label {
@@ -259,7 +257,7 @@
             padding: 5px;
             border: 2px solid #b8860b;
             border-radius: 5px;
-            width: 100%; /* Largura total */
+            width: 100%;
             margin-bottom: 20px;
         }
 
@@ -279,8 +277,8 @@
         }
 
         #backgroundPreview {
-            width: 100%; /* Largura total */
-            height: 300px; /* Altura aumentada */
+            width: 100%;
+            height: 300px;
             margin: 10px auto;
             background-size: cover;
             background-position: center;
@@ -288,7 +286,6 @@
             border-radius: 5px;
         }
 
-        /* Estilo da caixa de diálogo do Top 10 */
         #top10Dialog {
             position: absolute;
             top: 50%;
@@ -298,16 +295,16 @@
             border: 4px solid #8B4513;
             padding: 20px;
             display: none;
-            z-index: 4; /* Z-index maior para sobrepor tudo */
+            z-index: 4;
             white-space: pre-line;
             max-height: 80vh;
             overflow-y: auto;
             border-radius: 10px;
             font-family: 'GFS Didot', serif;
-            font-size: 36px; /* Tamanho da fonte aumentado */
+            font-size: 36px;
             color: rgb(247, 151, 9);
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            width: 400px; /* Largura aumentada para acomodar o texto maior */
+            width: 400px;
             text-align: center;
         }
 
@@ -335,7 +332,6 @@
             background-color: #a67c0a;
         }
 
-        /* Estilo da checkbox e label */
         #scoreToggle {
             display: flex;
             flex-direction: column;
@@ -385,6 +381,10 @@
                 <input type="checkbox" id="musicCheckbox" onchange="toggleMusic()">
                 <label for="musicCheckbox">Música</label>
             </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="3dCheckbox" onchange="toggle3D()">
+                <label for="3dCheckbox">3D</label>
+            </div>
         </div>
     </div>
 
@@ -396,7 +396,7 @@
             <option value="nietzsche.png">Nietzsche</option>
             <option value="diogenes.png">Diógenes</option>
             <option value="kant.png">Kant</option>
-            <option value="olavo.png">Olavo</option> <!-- Novo personagem -->
+            <option value="olavo.png">Olavo</option>
         </select>
         <button onclick="startGame()">Jogar</button>
     </div>
@@ -406,9 +406,9 @@
         <label for="backgroundSelect">Escolha o fundo:</label>
         <select id="backgroundSelect" onchange="updateBackgroundPreview()">
             <option value="background.jpeg">Ágora</option>
-            <option value="background2.jpeg">Jardins</option> 
+            <option value="background2.jpeg">Jardins</option>
             <option value="background3.jpeg">Oráculo</option>
-            <option value="background4.jpeg">Alpes</option> <!-- Novo fundo -->
+            <option value="background4.jpeg">Alpes</option>
         </select>
         <div id="backgroundPreview"></div>
         <button onclick="applyBackground()">OK</button>
@@ -424,6 +424,7 @@
 
     <!-- Final da Interface  -->
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script>
         // Lógica de Animação 
         const canvas = document.getElementById('gameCanvas');
@@ -452,14 +453,51 @@
         let gameOver = false;
         let gameStarted = false;
         let rankingDisplayed = false;
-        let showScore = true; // Variável para controlar a exibição do score
+        let showScore = true;
+        let is3D = false;
+
+        // Three.js variables
+        let scene, camera, renderer, bird3D, columns3D = [];
+
+        function init3D() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, canvas.width / canvas.height, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(canvas.width, canvas.height);
+            document.body.appendChild(renderer.domElement);
+
+            // Add bird
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+            bird3D = new THREE.Mesh(geometry, material);
+            scene.add(bird3D);
+
+            camera.position.z = 5;
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            renderer.render(scene, camera);
+        }
+
+        function toggle3D() {
+            is3D = document.getElementById('3dCheckbox').checked;
+            if (is3D) {
+                init3D();
+                animate3D();
+            } else {
+                if (renderer) {
+                    document.body.removeChild(renderer.domElement);
+                }
+            }
+        }
 
         function startGame() {
             const characterSelect = document.getElementById('character');
             birdImage.src = characterSelect.value;
             document.getElementById('characterSelection').style.display = 'none';
             document.getElementById('touchToStart').style.display = 'none';
-            showScore = document.getElementById('showScoreCheckbox').checked; // Atualiza a variável showScore
+            showScore = document.getElementById('showScoreCheckbox').checked;
 
             // Fecha a caixa do menu se estiver aberta
             const buttonContainer = document.querySelector('.button-container');

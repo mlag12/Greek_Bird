@@ -2,11 +2,13 @@
 <html lang="en">
 
 <head>
+    <!-- Configuração do Firebase -->
     <script type="module">
-        // Firebase configuration
+        // Importa funções necessárias do Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, orderBy, query, limit, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
+        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDlaMVBRQlulpV9MbVxasuGblF38KkY5f8",
             authDomain: "greek-bird.firebaseapp.com",
@@ -17,9 +19,11 @@
             measurementId: "G-PZBLWMH5W6"
         };
 
+        // Inicializa o Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
+        // Função para obter os 10 melhores scores
         window.getTopScores = async function getTopScores() {
             const scoresRef = collection(db, "scores");
             const q = query(scoresRef, orderBy("score", "desc"), limit(10));
@@ -31,11 +35,12 @@
             return topScores;
         }
 
+        // Função para salvar o score
         window.saveScore = async function saveScore(name, score) {
             try {
-                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
+                const topScores = await getTopScores(); // Obtém os 10 melhores scores
 
-                // Verifique se o novo score é maior que o menor no top 10
+                // Verifica se o novo score é maior que o menor score no top 10
                 if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
                     await addDoc(collection(db, "scores"), {
                         name: name,
@@ -54,6 +59,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Greek Bird - Dark Mode</title>
     <style>
+        /* Estilos CSS */
         @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
 
         body {
@@ -443,9 +449,10 @@
 </head>
 
 <body>
+    <!-- Áudio de fundo -->
     <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
 
-    <!-- Interface com usuário  -->
+    <!-- Interface com usuário -->
     <div id="background"></div>
     <canvas id="gameCanvas"></canvas>
     <div id="gameOverText">Game Over</div>
@@ -512,10 +519,10 @@
         <button onclick="submitScore()">Enviar</button>
     </div>
 
-    <!-- Final da Interface  -->
+    <!-- Final da Interface -->
 
     <script>
-        // Lógica de Animação 
+        // Lógica de Animação
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -545,43 +552,50 @@
         let rankingDisplayed = false;
         let showScore = true;
 
-        // Efeitos de morcegos
-        const bats = [];
-        const batImage = new Image();
-        batImage.src = 'bat.png'; // Imagem do morcego
+        // Efeitos de sangue
+        const bloodDrops = [];
+        const bloodColor = 'rgba(139, 0, 0, 0.8)';
 
-        function createBat(x, y) {
-            for (let i = 0; i < 20; i++) { // Cria vários morcegos
-                bats.push({
+        function createBloodDrop(x, y) {
+            for (let i = 0; i < 10; i++) { // Cria várias gotas de sangue
+                bloodDrops.push({
                     x: x + Math.random() * 20 - 10, // Posição aleatória ao redor do personagem
                     y: y,
-                    size: Math.random() * 20 + 10,
-                    speedX: (Math.random() - 0.5) * 4, // Movimento horizontal aleatório
-                    speedY: (Math.random() - 0.5) * 4, // Movimento vertical aleatório
+                    size: Math.random() * 5 + 2,
+                    speedX: (Math.random() - 0.5) * 2, // Movimento horizontal aleatório
+                    speedY: Math.random() * 2 + 1,
                     rotation: Math.random() * Math.PI * 2 // Rotação aleatória
                 });
             }
         }
 
-        function drawBat(x, y, size, rotation) {
+        function drawBloodDrop(x, y, size, rotation) {
             ctx.save();
             ctx.translate(x, y);
             ctx.rotate(rotation);
-            ctx.drawImage(batImage, -size / 2, -size / 2, size, size);
+            ctx.beginPath();
+            ctx.moveTo(0, -size);
+            ctx.quadraticCurveTo(size / 2, -size / 2, size, 0);
+            ctx.quadraticCurveTo(size / 2, size / 2, 0, size);
+            ctx.quadraticCurveTo(-size / 2, size / 2, -size, 0);
+            ctx.quadraticCurveTo(-size / 2, -size / 2, 0, -size);
+            ctx.closePath();
+            ctx.fillStyle = bloodColor;
+            ctx.fill();
             ctx.restore();
         }
 
-        function drawBats() {
-            bats.forEach((bat, index) => {
-                drawBat(bat.x, bat.y, bat.size, bat.rotation);
+        function drawBloodDrops() {
+            bloodDrops.forEach((drop, index) => {
+                drawBloodDrop(drop.x, drop.y, drop.size, drop.rotation);
 
-                // Atualiza a posição do morcego
-                bat.x += bat.speedX;
-                bat.y += bat.speedY;
+                // Atualiza a posição do sangue
+                drop.x += drop.speedX;
+                drop.y += drop.speedY;
 
-                // Remove o morcego quando ele sai da tela
-                if (bat.y > canvas.height || bat.y < 0 || bat.x > canvas.width || bat.x < 0) {
-                    bats.splice(index, 1);
+                // Remove o sangue quando ele sai da tela
+                if (drop.y > canvas.height) {
+                    bloodDrops.splice(index, 1);
                 }
             });
         }
@@ -724,9 +738,9 @@
                 ctx.fillText('Score: ' + score, 10, 30);
             }
 
-            // Desenha os morcegos
+            // Desenha o sangue
             if (document.body.classList.contains('dark-mode')) {
-                drawBats();
+                drawBloodDrops();
             }
 
             if (!gameOver) {
@@ -757,7 +771,7 @@
 
         canvas.addEventListener('click', (event) => {
             bird.velocity = bird.lift;
-            createBat(bird.x + bird.width / 2, bird.y + bird.height); // Morcegos ao pular
+            createBloodDrop(bird.x + bird.width / 2, bird.y + bird.height); // Sangue ao pular
         });
 
         // Função para alternar a música

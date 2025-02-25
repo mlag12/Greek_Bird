@@ -545,50 +545,43 @@
         let rankingDisplayed = false;
         let showScore = true;
 
-        // Efeitos de sangue
-        const bloodDrops = [];
-        const bloodColor = 'rgba(139, 0, 0, 0.8)';
+        // Efeitos de morcegos
+        const bats = [];
+        const batImage = new Image();
+        batImage.src = 'bat.png'; // Imagem do morcego
 
-        function createBloodDrop(x, y) {
-            for (let i = 0; i < 10; i++) { // Cria várias gotas de sangue
-                bloodDrops.push({
+        function createBat(x, y) {
+            for (let i = 0; i < 20; i++) { // Cria vários morcegos
+                bats.push({
                     x: x + Math.random() * 20 - 10, // Posição aleatória ao redor do personagem
                     y: y,
-                    size: Math.random() * 5 + 2,
-                    speedX: (Math.random() - 0.5) * 2, // Movimento horizontal aleatório
-                    speedY: Math.random() * 2 + 1,
+                    size: Math.random() * 20 + 10,
+                    speedX: (Math.random() - 0.5) * 4, // Movimento horizontal aleatório
+                    speedY: (Math.random() - 0.5) * 4, // Movimento vertical aleatório
                     rotation: Math.random() * Math.PI * 2 // Rotação aleatória
                 });
             }
         }
 
-        function drawBloodDrop(x, y, size, rotation) {
+        function drawBat(x, y, size, rotation) {
             ctx.save();
             ctx.translate(x, y);
             ctx.rotate(rotation);
-            ctx.beginPath();
-            ctx.moveTo(0, -size);
-            ctx.quadraticCurveTo(size / 2, -size / 2, size, 0);
-            ctx.quadraticCurveTo(size / 2, size / 2, 0, size);
-            ctx.quadraticCurveTo(-size / 2, size / 2, -size, 0);
-            ctx.quadraticCurveTo(-size / 2, -size / 2, 0, -size);
-            ctx.closePath();
-            ctx.fillStyle = bloodColor;
-            ctx.fill();
+            ctx.drawImage(batImage, -size / 2, -size / 2, size, size);
             ctx.restore();
         }
 
-        function drawBloodDrops() {
-            bloodDrops.forEach((drop, index) => {
-                drawBloodDrop(drop.x, drop.y, drop.size, drop.rotation);
+        function drawBats() {
+            bats.forEach((bat, index) => {
+                drawBat(bat.x, bat.y, bat.size, bat.rotation);
 
-                // Atualiza a posição do sangue
-                drop.x += drop.speedX;
-                drop.y += drop.speedY;
+                // Atualiza a posição do morcego
+                bat.x += bat.speedX;
+                bat.y += bat.speedY;
 
-                // Remove o sangue quando ele sai da tela
-                if (drop.y > canvas.height) {
-                    bloodDrops.splice(index, 1);
+                // Remove o morcego quando ele sai da tela
+                if (bat.y > canvas.height || bat.y < 0 || bat.x > canvas.width || bat.x < 0) {
+                    bats.splice(index, 1);
                 }
             });
         }
@@ -731,9 +724,9 @@
                 ctx.fillText('Score: ' + score, 10, 30);
             }
 
-            // Desenha o sangue
+            // Desenha os morcegos
             if (document.body.classList.contains('dark-mode')) {
-                drawBloodDrops();
+                drawBats();
             }
 
             if (!gameOver) {
@@ -764,7 +757,7 @@
 
         canvas.addEventListener('click', (event) => {
             bird.velocity = bird.lift;
-            createBloodDrop(bird.x + bird.width / 2, bird.y + bird.height); // Sangue ao pular
+            createBat(bird.x + bird.width / 2, bird.y + bird.height); // Morcegos ao pular
         });
 
         // Função para alternar a música

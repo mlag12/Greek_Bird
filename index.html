@@ -440,7 +440,8 @@
             height: 70,
             gravity: 0.15,
             lift: -6,
-            velocity: 1
+            velocity: 1,
+            z: 0 // Profundidade do pássaro no eixo Z
         };
 
         const columns = [];
@@ -478,9 +479,11 @@
 
         function drawBird() {
             if (is3DMode) {
+                // Aplica a perspectiva 3D ao pássaro
+                const scale = 1 + bird.z / 1000; // Ajusta o tamanho com base na profundidade
                 ctx.save();
                 ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
-                ctx.scale(1, 1.2); // Aplica uma leve distorção para simular profundidade
+                ctx.scale(scale, scale);
                 ctx.translate(-(bird.x + bird.width / 2), -(bird.y + bird.height / 2));
             }
             ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height);
@@ -491,9 +494,11 @@
 
         function drawColumn(column) {
             if (is3DMode) {
+                // Aplica a perspectiva 3D às colunas
+                const scale = 1 + column.z / 1000; // Ajusta o tamanho com base na profundidade
                 ctx.save();
                 ctx.translate(column.x + columnWidth / 2, column.gapY + gapHeight / 2);
-                ctx.scale(1, 1.1); // Aplica uma leve distorção para simular profundidade
+                ctx.scale(scale, scale);
                 ctx.translate(-(column.x + columnWidth / 2), -(column.gapY + gapHeight / 2));
             }
             ctx.drawImage(columnImage, column.x, column.gapY + gapHeight, columnWidth, canvas.height - column.gapY - gapHeight);
@@ -526,7 +531,7 @@
 
             if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
                 const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
-                columns.push({ x: canvas.width, gapY });
+                columns.push({ x: canvas.width, gapY, z: Math.random() * 500 }); // Adiciona profundidade aleatória
             }
         }
 

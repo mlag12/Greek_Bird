@@ -33,7 +33,9 @@
 
         window.saveScore = async function saveScore(name, score) {
             try {
-                const topScores = await getTopScores();
+                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
+
+                // Verifique se o novo score é maior que o menor no top 10
                 if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
                     await addDoc(collection(db, "scores"), {
                         name: name,
@@ -117,7 +119,7 @@
             border: 4px solid #8B4513;
             padding: 20px;
             display: none;
-            z-index: 3;
+            z-index: 3; /* Z-index maior para sobrepor o menu */
             white-space: pre-line;
             max-height: 80vh;
             overflow-y: auto;
@@ -130,6 +132,7 @@
             text-align: center;
         }
 
+        /* Estilo do ícone de Menu */
         #menuIcon {
             position: absolute;
             top: 10px;
@@ -140,6 +143,7 @@
             z-index: 2;
         }
 
+        /* Estilo da caixa de botões */
         .button-container {
             position: absolute;
             top: 50px;
@@ -148,14 +152,14 @@
             flex-direction: column;
             gap: 10px;
             z-index: 2;
-            display: none;
+            display: none; /* Inicialmente oculto */
             background: rgba(255, 223, 186, 0.9);
             border: 4px solid #8B4513;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            width: 200px;
-            align-items: center;
+            width: 200px; /* Largura aumentada */
+            align-items: center; /* Centraliza os itens horizontalmente */
         }
 
         .button-container button {
@@ -169,7 +173,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             text-align: center;
-            width: 100%;
+            width: 100%; /* Faz os botões ocuparem a largura total */
         }
 
         .button-container button:hover {
@@ -241,8 +245,8 @@
             text-align: center;
             border: 2px solid #b8860b;
             display: none;
-            width: 80%;
-            max-width: 600px;
+            width: 80%; /* Largura aumentada */
+            max-width: 600px; /* Largura máxima */
         }
 
         #backgroundSelection label {
@@ -255,7 +259,7 @@
             padding: 5px;
             border: 2px solid #b8860b;
             border-radius: 5px;
-            width: 100%;
+            width: 100%; /* Largura total */
             margin-bottom: 20px;
         }
 
@@ -275,8 +279,8 @@
         }
 
         #backgroundPreview {
-            width: 100%;
-            height: 300px;
+            width: 100%; /* Largura total */
+            height: 300px; /* Altura aumentada */
             margin: 10px auto;
             background-size: cover;
             background-position: center;
@@ -284,6 +288,7 @@
             border-radius: 5px;
         }
 
+        /* Estilo da caixa de diálogo do Top 10 */
         #top10Dialog {
             position: absolute;
             top: 50%;
@@ -293,16 +298,16 @@
             border: 4px solid #8B4513;
             padding: 20px;
             display: none;
-            z-index: 4;
+            z-index: 4; /* Z-index maior para sobrepor tudo */
             white-space: pre-line;
             max-height: 80vh;
             overflow-y: auto;
             border-radius: 10px;
             font-family: 'GFS Didot', serif;
-            font-size: 36px;
+            font-size: 36px; /* Tamanho da fonte aumentado */
             color: rgb(247, 151, 9);
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            width: 400px;
+            width: 400px; /* Largura aumentada para acomodar o texto maior */
             text-align: center;
         }
 
@@ -330,6 +335,7 @@
             background-color: #a67c0a;
         }
 
+        /* Estilo da checkbox e label */
         #scoreToggle {
             display: flex;
             flex-direction: column;
@@ -380,8 +386,8 @@
                 <label for="musicCheckbox">Música</label>
             </div>
             <div class="checkbox-container">
-                <input type="checkbox" id="3dModeCheckbox" onchange="toggle3DMode()">
-                <label for="3dModeCheckbox">Modo 3D</label>
+                <input type="checkbox" id="transcendentalCheckbox" onchange="toggleTranscendentalMode()">
+                <label for="transcendentalCheckbox">Modo Transcendental</label>
             </div>
         </div>
     </div>
@@ -394,7 +400,7 @@
             <option value="nietzsche.png">Nietzsche</option>
             <option value="diogenes.png">Diógenes</option>
             <option value="kant.png">Kant</option>
-            <option value="olavo.png">Olavo</option>
+            <option value="olavo.png">Olavo</option> <!-- Novo personagem -->
         </select>
         <button onclick="startGame()">Jogar</button>
     </div>
@@ -404,9 +410,9 @@
         <label for="backgroundSelect">Escolha o fundo:</label>
         <select id="backgroundSelect" onchange="updateBackgroundPreview()">
             <option value="background.jpeg">Ágora</option>
-            <option value="background2.jpeg">Jardins</option>
+            <option value="background2.jpeg">Jardins</option> 
             <option value="background3.jpeg">Oráculo</option>
-            <option value="background4.jpeg">Alpes</option>
+            <option value="background4.jpeg">Alpes</option> <!-- Novo fundo -->
         </select>
         <div id="backgroundPreview"></div>
         <button onclick="applyBackground()">OK</button>
@@ -440,8 +446,7 @@
             height: 70,
             gravity: 0.15,
             lift: -6,
-            velocity: 1,
-            z: 0 // Profundidade do pássaro no eixo Z
+            velocity: 1
         };
 
         const columns = [];
@@ -451,20 +456,15 @@
         let gameOver = false;
         let gameStarted = false;
         let rankingDisplayed = false;
-        let showScore = true;
-        let is3DMode = false; // Variável para controlar o modo 3D
-
-        // Função para alternar o modo 3D
-        function toggle3DMode() {
-            is3DMode = document.getElementById('3dModeCheckbox').checked;
-        }
+        let showScore = true; // Variável para controlar a exibição do score
+        let transcendentalMode = false; // Variável para controlar o modo Transcendental
 
         function startGame() {
             const characterSelect = document.getElementById('character');
             birdImage.src = characterSelect.value;
             document.getElementById('characterSelection').style.display = 'none';
             document.getElementById('touchToStart').style.display = 'none';
-            showScore = document.getElementById('showScoreCheckbox').checked;
+            showScore = document.getElementById('showScoreCheckbox').checked; // Atualiza a variável showScore
 
             // Fecha a caixa do menu se estiver aberta
             const buttonContainer = document.querySelector('.button-container');
@@ -478,37 +478,15 @@
         }
 
         function drawBird() {
-            if (is3DMode) {
-                // Aplica a perspectiva 3D ao pássaro
-                const scale = 1 + bird.z / 1000; // Ajusta o tamanho com base na profundidade
-                ctx.save();
-                ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
-                ctx.scale(scale, scale);
-                ctx.translate(-(bird.x + bird.width / 2), -(bird.y + bird.height / 2));
-            }
             ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height);
-            if (is3DMode) {
-                ctx.restore();
-            }
         }
 
         function drawColumn(column) {
-            if (is3DMode) {
-                // Aplica a perspectiva 3D às colunas
-                const scale = 1 + column.z / 1000; // Ajusta o tamanho com base na profundidade
-                ctx.save();
-                ctx.translate(column.x + columnWidth / 2, column.gapY + gapHeight / 2);
-                ctx.scale(scale, scale);
-                ctx.translate(-(column.x + columnWidth / 2), -(column.gapY + gapHeight / 2));
-            }
             ctx.drawImage(columnImage, column.x, column.gapY + gapHeight, columnWidth, canvas.height - column.gapY - gapHeight);
             ctx.save();
             ctx.scale(1, -1);
             ctx.drawImage(columnImage, column.x, -column.gapY, columnWidth, column.gapY);
             ctx.restore();
-            if (is3DMode) {
-                ctx.restore();
-            }
         }
 
         function updateColumns() {
@@ -531,7 +509,7 @@
 
             if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
                 const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
-                columns.push({ x: canvas.width, gapY, z: Math.random() * 500 }); // Adiciona profundidade aleatória
+                columns.push({ x: canvas.width, gapY });
             }
         }
 
@@ -619,6 +597,18 @@
                 ctx.fillText('Score: ' + score, 10, 30);
             }
 
+            if (transcendentalMode) {
+                // Efeitos visuais 3D no modo Transcendental
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(0, bird.y);
+                ctx.lineTo(canvas.width, bird.y);
+                ctx.stroke();
+            }
+
             if (!gameOver) {
                 requestAnimationFrame(animate);
             } else {
@@ -702,10 +692,15 @@
             showScore = document.getElementById('showScoreCheckbox').checked;
         }
 
+        // Função para alternar o modo Transcendental
+        function toggleTranscendentalMode() {
+            transcendentalMode = document.getElementById('transcendentalCheckbox').checked;
+        }
+
         // Começar com música parada
         window.onload = () => {
             const musicCheckbox = document.getElementById('musicCheckbox');
-            musicCheckbox.checked = false;
+            musicCheckbox.checked = false; // Música começa desligada
         };
     </script>
 </body>

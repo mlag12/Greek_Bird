@@ -2,10 +2,60 @@
 <html lang="en">
 
 <head>
+    <script type="module">
+        // Firebase configuration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, orderBy, query, limit, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlaMVBRQlulpV9MbVxasuGblF38KkY5f8",
+            authDomain: "greek-bird.firebaseapp.com",
+            projectId: "greek-bird",
+            storageBucket: "greek-bird.appspot.com",
+            messagingSenderId: "58870766246",
+            appId: "1:58870766246:web:6eb9c796ec11abd0e5f267",
+            measurementId: "G-PZBLWMH5W6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.getTopScores = async function getTopScores() {
+            const scoresRef = collection(db, "scores");
+            const q = query(scoresRef, orderBy("score", "desc"), limit(10));
+            const querySnapshot = await getDocs(q);
+            const topScores = [];
+            querySnapshot.forEach((doc) => {
+                topScores.push(doc.data());
+            });
+            return topScores;
+        }
+
+        window.saveScore = async function saveScore(name, score) {
+            try {
+                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
+
+                // Verifique se o novo score é maior que o menor no top 10
+                if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
+                    await addDoc(collection(db, "scores"), {
+                        name: name,
+                        score: score
+                    });
+                    console.log("Score saved!");
+                } else {
+                    console.log("Score too low to enter top 10.");
+                }
+            } catch (error) {
+                console.error("Error saving score: ", error);
+            }
+        };
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Greek Bird - Dark Mode</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
+
         body {
             font-family: 'GFS Didot', serif;
             margin: 0;
@@ -110,6 +160,7 @@
             box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
         }
 
+        /* Estilo do ícone de Menu */
         #menuIcon {
             position: absolute;
             top: 10px;
@@ -125,6 +176,7 @@
             text-shadow: 0 0 10px #FF0000;
         }
 
+        /* Estilo da caixa de botões */
         .button-container {
             position: absolute;
             top: 50px;
@@ -357,6 +409,7 @@
             border: 2px solid #8B0000;
         }
 
+        /* Estilo da checkbox e label */
         #scoreToggle {
             display: flex;
             flex-direction: column;
@@ -392,7 +445,7 @@
 <body>
     <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
 
-    <!-- Interface com usuário -->
+    <!-- Interface com usuário  -->
     <div id="background"></div>
     <canvas id="gameCanvas"></canvas>
     <div id="gameOverText">Game Over</div>
@@ -405,7 +458,7 @@
     <div id="menuIcon" onclick="toggleMenu()">☰</div>
 
     <!-- Botões no canto superior direito -->
-    <div class="button-container" id="buttonContainer">
+    <div class="button-container">
         <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
         <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
         <button id="backgroundButton" onclick="showBackgroundSelection()">Fundos</button>
@@ -459,10 +512,10 @@
         <button onclick="submitScore()">Enviar</button>
     </div>
 
-    <!-- Final da Interface -->
+    <!-- Final da Interface  -->
 
     <script>
-        // Lógica de Animação
+        // Lógica de Animação 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -474,8 +527,6 @@
         columnImage.src = 'column.jpeg';
         const orbImage = new Image();
         orbImage.src = 'orb.png'; // Imagem do orb
-        const batImage = new Image();
-        batImage.src = 'bat.png'; // Imagem do morcego
 
         const bird = {
             x: 50,
@@ -496,26 +547,39 @@
         let rankingDisplayed = false;
         let showScore = true;
 
-        // Orb de energia
-        let orb = null;
-        let orbActive = false;
-
-        // Efeitos de luz
-        let flashEffect = false;
-        let flashAlpha = 0;
-
-        // Morcegos
+        // Efeitos de morcegos
         const bats = [];
+        const batImage = new Image();
+        batImage.src = 'bat.png'; // Imagem do morcego
+
+        // Orb de energia
+        let orb = {
+            x: 0,
+            y: 0,
+            width: 40,
+            height: 40,
+            active: false,
+            collected: false
+        };
+
+        // Efeito de luz
+        let lightEffect = {
+            active: false,
+            alpha: 0,
+            maxAlpha: 0.5,
+            duration: 1000, // 1 segundo
+            startTime: 0
+        };
 
         function createBat(x, y) {
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 10; i++) { // Cria vários morcegos
                 bats.push({
-                    x: x + Math.random() * 20 - 10,
+                    x: x + Math.random() * 20 - 10, // Posição aleatória ao redor do personagem
                     y: y,
                     size: Math.random() * 20 + 10,
-                    speedX: (Math.random() - 0.5) * 4,
+                    speedX: (Math.random() - 0.5) * 4, // Movimento horizontal aleatório
                     speedY: (Math.random() - 0.5) * 4,
-                    rotation: Math.random() * Math.PI * 2
+                    rotation: Math.random() * Math.PI * 2 // Rotação aleatória
                 });
             }
         }
@@ -543,62 +607,6 @@
             });
         }
 
-        // Função para alternar o menu
-        function toggleMenu() {
-            const buttonContainer = document.getElementById('buttonContainer');
-            if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
-                buttonContainer.style.display = 'flex';
-            } else {
-                buttonContainer.style.display = 'none';
-            }
-        }
-
-        function createOrb() {
-            if (score > 0 && score % 15 === 0 && !orbActive) {
-                const column = columns[columns.length - 1];
-                orb = {
-                    x: column.x + columnWidth / 2 - 25, // Centralizado na coluna
-                    y: column.gapY + gapHeight / 2 - 25, // Centralizado no gap
-                    width: 50,
-                    height: 50
-                };
-                orbActive = true;
-            }
-        }
-
-        function drawOrb() {
-            if (orb && orbActive) {
-                ctx.drawImage(orbImage, orb.x, orb.y, orb.width, orb.height);
-            }
-        }
-
-        function checkOrbPass() {
-            if (orb && orbActive && bird.x > orb.x + orb.width) {
-                // Ativa o efeito de clarão
-                flashEffect = true;
-                orbActive = false;
-                orb = null;
-            }
-        }
-
-        function drawFlashEffect() {
-            if (flashEffect) {
-                flashAlpha = 0.8; // Inicia com alta opacidade
-                const interval = setInterval(() => {
-                    flashAlpha -= 0.05; // Diminui a opacidade gradualmente
-                    if (flashAlpha <= 0) {
-                        flashEffect = false;
-                        clearInterval(interval);
-                    }
-                }, 30);
-            }
-
-            if (flashAlpha > 0) {
-                ctx.fillStyle = `rgba(255, 255, 255, ${flashAlpha})`;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-            }
-        }
-
         function startGame() {
             const characterSelect = document.getElementById('character');
             birdImage.src = characterSelect.value;
@@ -606,11 +614,13 @@
             document.getElementById('touchToStart').style.display = 'none';
             showScore = document.getElementById('showScoreCheckbox').checked;
 
+            // Fecha a caixa do menu se estiver aberta
             const buttonContainer = document.querySelector('.button-container');
             if (buttonContainer.style.display === 'flex') {
                 buttonContainer.style.display = 'none';
             }
 
+            // Inicia o jogo
             gameStarted = true;
             restartGame();
         }
@@ -634,7 +644,6 @@
                 if (column.x + columnWidth < 0) {
                     columns.splice(i, 1);
                     score++;
-                    createOrb(); // Verifica se deve criar um orb
                 }
                 drawColumn(column);
                 if (
@@ -649,6 +658,14 @@
             if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
                 const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
                 columns.push({ x: canvas.width, gapY });
+
+                // Ativa o orb a cada 15 pontos
+                if (score % 15 === 0 && score !== 0) {
+                    orb.x = columns[columns.length - 1].x + columnWidth / 2 - orb.width / 2;
+                    orb.y = columns[columns.length - 1].gapY + gapHeight / 2 - orb.height / 2;
+                    orb.active = true;
+                    orb.collected = false;
+                }
             }
         }
 
@@ -661,6 +678,40 @@
             }
         }
 
+        function drawOrb() {
+            if (orb.active && !orb.collected) {
+                ctx.drawImage(orbImage, orb.x, orb.y, orb.width, orb.height);
+            }
+        }
+
+        function checkOrbCollision() {
+            if (orb.active && !orb.collected) {
+                if (
+                    bird.x + bird.width > orb.x &&
+                    bird.x < orb.x + orb.width &&
+                    bird.y + bird.height > orb.y &&
+                    bird.y < orb.y + orb.height
+                ) {
+                    orb.collected = true;
+                    lightEffect.active = true;
+                    lightEffect.startTime = Date.now();
+                }
+            }
+        }
+
+        function drawLightEffect() {
+            if (lightEffect.active) {
+                const elapsed = Date.now() - lightEffect.startTime;
+                if (elapsed < lightEffect.duration) {
+                    lightEffect.alpha = lightEffect.maxAlpha * (1 - elapsed / lightEffect.duration);
+                    ctx.fillStyle = `rgba(255, 255, 0, ${lightEffect.alpha})`;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                } else {
+                    lightEffect.active = false;
+                }
+            }
+        }
+
         function restartGame() {
             bird.y = canvas.height / 2;
             bird.velocity = 0;
@@ -668,11 +719,63 @@
             score = 0;
             gameOver = false;
             rankingDisplayed = false;
-            orb = null;
-            orbActive = false;
+            orb.active = false;
+            orb.collected = false;
+            lightEffect.active = false;
             document.getElementById('gameOverText').style.display = 'none';
             document.getElementById('rankingText').style.display = 'none';
             animate();
+        }
+
+        async function displayRanking() {
+            const topScores = await getTopScores();
+            let rankingText = "Top 10 Scores:\n";
+            topScores.forEach((entry, index) => {
+                rankingText += `${index + 1}. ${entry.name}: ${entry.score}\n`;
+            });
+
+            rankingText += `\nSua pontuação: ${score}`;
+            document.getElementById('rankingText').innerText = rankingText;
+
+            rankingDisplayed = true;
+        }
+
+        function toggleRanking() {
+            const rankingText = document.getElementById('rankingText');
+            if (rankingText.style.display === 'none' || rankingText.style.display === '') {
+                displayRanking();
+                rankingText.style.display = 'block';
+            } else {
+                rankingText.style.display = 'none';
+            }
+        }
+
+        async function saveAndDisplayRanking() {
+            const topScores = await getTopScores();
+
+            if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
+                document.getElementById('top10Score').textContent = score;
+                document.getElementById('top10Dialog').style.display = 'block';
+            } else {
+                console.log("Score muito baixo para entrar no top 10.");
+                displayRanking();
+            }
+        }
+
+        async function submitScore() {
+            const playerName = document.getElementById('playerName').value;
+            if (playerName) {
+                try {
+                    await saveScore(playerName, score);
+                    document.getElementById('top10Dialog').style.display = 'none';
+                    displayRanking();
+                } catch (error) {
+                    console.error("Erro ao salvar score:", error);
+                    alert("Ocorreu um erro ao salvar o score. Tente novamente.");
+                }
+            } else {
+                alert("Nome inválido! O score não foi salvo.");
+            }
         }
 
         function animate() {
@@ -681,17 +784,18 @@
             drawBird();
             updateColumns();
             drawOrb();
-            checkOrbPass();
-            drawFlashEffect();
-
-            if (document.body.classList.contains('dark-mode')) {
-                drawBats(); // Desenha os morcegos apenas no modo dark
-            }
+            checkOrbCollision();
+            drawLightEffect();
 
             if (showScore) {
                 ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#8B0000' : '#b8860b';
                 ctx.font = '24px GFS Didot';
                 ctx.fillText('Score: ' + score, 10, 30);
+            }
+
+            // Desenha os morcegos
+            if (document.body.classList.contains('dark-mode')) {
+                drawBats();
             }
 
             if (!gameOver) {
@@ -713,13 +817,14 @@
                 document.getElementById('touchToStart').style.display = 'none';
             }
 
+            // Fecha o menu ao clicar em "Start"
             const buttonContainer = document.querySelector('.button-container');
             if (buttonContainer.style.display === 'flex') {
                 buttonContainer.style.display = 'none';
             }
         });
 
-        canvas.addEventListener('click', () => {
+        canvas.addEventListener('click', (event) => {
             bird.velocity = bird.lift;
             createBat(bird.x + bird.width / 2, bird.y + bird.height); // Morcegos ao pular
         });
@@ -740,6 +845,16 @@
         function toggleDarkMode() {
             const darkCheckbox = document.getElementById('darkCheckbox');
             document.body.classList.toggle('dark-mode', darkCheckbox.checked);
+        }
+
+        // Função para alternar a exibição do menu
+        function toggleMenu() {
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
+                buttonContainer.style.display = 'flex';
+            } else {
+                buttonContainer.style.display = 'none';
+            }
         }
 
         // Função para mostrar a seleção de personagem

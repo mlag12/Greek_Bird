@@ -553,16 +553,30 @@
                 x: x,
                 y: y,
                 size: Math.random() * 10 + 5,
-                speedY: Math.random() * 2 + 1
+                speedY: Math.random() * 2 + 1,
+                rotation: Math.random() * Math.PI * 2 // Rotação aleatória para a gota
             });
+        }
+
+        function drawBloodDrop(x, y, size, rotation) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.beginPath();
+            ctx.moveTo(0, -size);
+            ctx.quadraticCurveTo(size / 2, -size / 2, size, 0);
+            ctx.quadraticCurveTo(size / 2, size / 2, 0, size);
+            ctx.quadraticCurveTo(-size / 2, size / 2, -size, 0);
+            ctx.quadraticCurveTo(-size / 2, -size / 2, 0, -size);
+            ctx.closePath();
+            ctx.fillStyle = bloodColor;
+            ctx.fill();
+            ctx.restore();
         }
 
         function drawBloodDrops() {
             bloodDrops.forEach((drop, index) => {
-                ctx.beginPath();
-                ctx.arc(drop.x, drop.y, drop.size, 0, Math.PI * 2);
-                ctx.fillStyle = bloodColor;
-                ctx.fill();
+                drawBloodDrop(drop.x, drop.y, drop.size, drop.rotation);
 
                 // Atualiza a posição do sangue
                 drop.y += drop.speedY;
@@ -619,7 +633,9 @@
                     (bird.y < column.gapY || bird.y + bird.height > column.gapY + gapHeight)
                 ) {
                     gameOver = true;
-                    createBloodDrop(bird.x + bird.width / 2, bird.y + bird.height / 2); // Sangue ao colidir
+                    for (let i = 0; i < 20; i++) { // Cria várias gotas de sangue
+                        createBloodDrop(bird.x + bird.width / 2, bird.y + bird.height / 2);
+                    }
                 }
             }
 
@@ -635,7 +651,9 @@
 
             if (bird.y + bird.height > canvas.height || bird.y < 0) {
                 gameOver = true;
-                createBloodDrop(bird.x + bird.width / 2, bird.y + bird.height / 2); // Sangue ao colidir
+                for (let i = 0; i < 20; i++) { // Cria várias gotas de sangue
+                    createBloodDrop(bird.x + bird.width / 2, bird.y + bird.height / 2);
+                }
             }
         }
 
@@ -801,6 +819,11 @@
             const backgroundDiv = document.getElementById('background');
             backgroundDiv.style.backgroundImage = `url('${backgroundSelect.value}')`;
             document.getElementById('backgroundSelection').style.display = 'none';
+        }
+
+        // Função para alternar a exibição do score
+        function toggleScoreDisplay() {
+            showScore = document.getElementById('showScoreCheckbox').checked;
         }
 
         // Começar com música parada

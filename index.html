@@ -1,14 +1,15 @@
+refaça o código inteiro desse jogo criando morcegos em vez de gotas de sangue saindo do personagem quando clica para pular por todos os lados em grande quantidade
+
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <!-- Configuração do Firebase -->
     <script type="module">
-        // Importa funções necessárias do Firebase
+        // Firebase configuration
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
         import { getFirestore, collection, getDocs, orderBy, query, limit, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
-        // Configuração do Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyDlaMVBRQlulpV9MbVxasuGblF38KkY5f8",
             authDomain: "greek-bird.firebaseapp.com",
@@ -19,11 +20,9 @@
             measurementId: "G-PZBLWMH5W6"
         };
 
-        // Inicializa o Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Função para obter os 10 melhores scores
         window.getTopScores = async function getTopScores() {
             const scoresRef = collection(db, "scores");
             const q = query(scoresRef, orderBy("score", "desc"), limit(10));
@@ -35,12 +34,11 @@
             return topScores;
         }
 
-        // Função para salvar o score
         window.saveScore = async function saveScore(name, score) {
             try {
-                const topScores = await getTopScores(); // Obtém os 10 melhores scores
+                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
 
-                // Verifica se o novo score é maior que o menor score no top 10
+                // Verifique se o novo score é maior que o menor no top 10
                 if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
                     await addDoc(collection(db, "scores"), {
                         name: name,
@@ -59,7 +57,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Greek Bird - Dark Mode</title>
     <style>
-        /* Estilos CSS */
         @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
 
         body {
@@ -449,10 +446,9 @@
 </head>
 
 <body>
-    <!-- Áudio de fundo -->
     <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
 
-    <!-- Interface com usuário -->
+    <!-- Interface com usuário  -->
     <div id="background"></div>
     <canvas id="gameCanvas"></canvas>
     <div id="gameOverText">Game Over</div>
@@ -519,10 +515,10 @@
         <button onclick="submitScore()">Enviar</button>
     </div>
 
-    <!-- Final da Interface -->
+    <!-- Final da Interface  -->
 
     <script>
-        // Lógica de Animação
+        // Lógica de Animação 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;

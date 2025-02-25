@@ -405,7 +405,7 @@
     <div id="menuIcon" onclick="toggleMenu()">☰</div>
 
     <!-- Botões no canto superior direito -->
-    <div class="button-container">
+    <div class="button-container" id="buttonContainer">
         <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
         <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
         <button id="backgroundButton" onclick="showBackgroundSelection()">Fundos</button>
@@ -501,6 +501,16 @@
         // Efeitos de luz
         let flashEffect = false;
         let flashAlpha = 0;
+
+        // Função para alternar o menu
+        function toggleMenu() {
+            const buttonContainer = document.getElementById('buttonContainer');
+            if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
+                buttonContainer.style.display = 'flex';
+            } else {
+                buttonContainer.style.display = 'none';
+            }
+        }
 
         function createOrb() {
             if (score > 0 && score % 15 === 0 && !orbActive) {

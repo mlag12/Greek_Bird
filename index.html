@@ -52,7 +52,7 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greek Bird 3D</title>
+    <title>Greek Bird</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
 
@@ -119,7 +119,7 @@
             border: 4px solid #8B4513;
             padding: 20px;
             display: none;
-            z-index: 3;
+            z-index: 3; /* Z-index maior para sobrepor o menu */
             white-space: pre-line;
             max-height: 80vh;
             overflow-y: auto;
@@ -132,6 +132,7 @@
             text-align: center;
         }
 
+        /* Estilo do ícone de Menu */
         #menuIcon {
             position: absolute;
             top: 10px;
@@ -142,6 +143,7 @@
             z-index: 2;
         }
 
+        /* Estilo da caixa de botões */
         .button-container {
             position: absolute;
             top: 50px;
@@ -150,14 +152,14 @@
             flex-direction: column;
             gap: 10px;
             z-index: 2;
-            display: none;
+            display: none; /* Inicialmente oculto */
             background: rgba(255, 223, 186, 0.9);
             border: 4px solid #8B4513;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            width: 200px;
-            align-items: center;
+            width: 200px; /* Largura aumentada */
+            align-items: center; /* Centraliza os itens horizontalmente */
         }
 
         .button-container button {
@@ -171,7 +173,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             text-align: center;
-            width: 100%;
+            width: 100%; /* Faz os botões ocuparem a largura total */
         }
 
         .button-container button:hover {
@@ -243,8 +245,8 @@
             text-align: center;
             border: 2px solid #b8860b;
             display: none;
-            width: 80%;
-            max-width: 600px;
+            width: 80%; /* Largura aumentada */
+            max-width: 600px; /* Largura máxima */
         }
 
         #backgroundSelection label {
@@ -257,7 +259,7 @@
             padding: 5px;
             border: 2px solid #b8860b;
             border-radius: 5px;
-            width: 100%;
+            width: 100%; /* Largura total */
             margin-bottom: 20px;
         }
 
@@ -277,8 +279,8 @@
         }
 
         #backgroundPreview {
-            width: 100%;
-            height: 300px;
+            width: 100%; /* Largura total */
+            height: 300px; /* Altura aumentada */
             margin: 10px auto;
             background-size: cover;
             background-position: center;
@@ -286,6 +288,7 @@
             border-radius: 5px;
         }
 
+        /* Estilo da caixa de diálogo do Top 10 */
         #top10Dialog {
             position: absolute;
             top: 50%;
@@ -295,16 +298,16 @@
             border: 4px solid #8B4513;
             padding: 20px;
             display: none;
-            z-index: 4;
+            z-index: 4; /* Z-index maior para sobrepor tudo */
             white-space: pre-line;
             max-height: 80vh;
             overflow-y: auto;
             border-radius: 10px;
             font-family: 'GFS Didot', serif;
-            font-size: 36px;
+            font-size: 36px; /* Tamanho da fonte aumentado */
             color: rgb(247, 151, 9);
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            width: 400px;
+            width: 400px; /* Largura aumentada para acomodar o texto maior */
             text-align: center;
         }
 
@@ -332,6 +335,7 @@
             background-color: #a67c0a;
         }
 
+        /* Estilo da checkbox e label */
         #scoreToggle {
             display: flex;
             flex-direction: column;
@@ -350,54 +354,333 @@
             color: #b8860b;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 
 <body>
+    <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
+
+    <!-- Interface com usuário  -->
     <div id="background"></div>
     <canvas id="gameCanvas"></canvas>
-
     <div id="gameOverText">Game Over</div>
-    <div id="touchToStart">Touch to Start</div>
-
+    <div id="touchToStart">
+        <button id="startButton"> Start </button>
+    </div>
     <div id="rankingText"></div>
-    <div id="menuIcon">&#9776;</div>
 
+    <!-- Ícone de Menu -->
+    <div id="menuIcon" onclick="toggleMenu()">☰</div>
+
+    <!-- Botões no canto superior direito -->
     <div class="button-container">
-        <button id="startButton">Start Game</button>
-    </div>
-
-    <div id="characterSelection">
-        <label for="characterSelect">Choose Character:</label>
-        <select id="characterSelect">
-            <option value="bird">Bird</option>
-            <option value="eagle">Eagle</option>
-        </select>
-        <button id="startGameButton">Start</button>
-    </div>
-
-    <div id="backgroundSelection">
-        <label for="backgroundSelect">Choose Background:</label>
-        <select id="backgroundSelect">
-            <option value="forest">Forest</option>
-            <option value="mountain">Mountain</option>
-        </select>
-        <button id="setBackgroundButton">Set Background</button>
-    </div>
-
-    <div id="top10Dialog">
-        <input type="text" id="playerName" placeholder="Enter your name">
-        <button id="submitScoreButton">Submit Score</button>
-    </div>
-
-    <div id="scoreToggle">
-        <div class="checkbox-container">
-            <label for="scoreCheckbox">Show Scores</label>
-            <input type="checkbox" id="scoreCheckbox">
+        <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
+        <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
+        <button id="backgroundButton" onclick="showBackgroundSelection()">Fundos</button>
+        <div id="scoreToggle">
+            <div class="checkbox-container">
+                <input type="checkbox" id="showScoreCheckbox" checked onchange="toggleScoreDisplay()">
+                <label for="showScoreCheckbox">Mostrar Score</label>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="musicCheckbox" onchange="toggleMusic()">
+                <label for="musicCheckbox">Música</label>
+            </div>
         </div>
     </div>
 
-    <script src="game.js"></script>
+    <!-- Caixa de seleção de personagem -->
+    <div id="characterSelection">
+        <label for="character">Escolha seu personagem:</label>
+        <select id="character">
+            <option value="socrates.png">Sócrates</option>
+            <option value="nietzsche.png">Nietzsche</option>
+            <option value="diogenes.png">Diógenes</option>
+            <option value="kant.png">Kant</option>
+            <option value="olavo.png">Olavo</option> <!-- Novo personagem -->
+        </select>
+        <button onclick="startGame()">Jogar</button>
+    </div>
+
+    <!-- Caixa de seleção de fundo -->
+    <div id="backgroundSelection">
+        <label for="backgroundSelect">Escolha o fundo:</label>
+        <select id="backgroundSelect" onchange="updateBackgroundPreview()">
+            <option value="background.jpeg">Ágora</option>
+            <option value="background2.jpeg">Jardins</option> 
+            <option value="background3.jpeg">Oráculo</option>
+            <option value="background4.jpeg">Alpes</option> <!-- Novo fundo -->
+        </select>
+        <div id="backgroundPreview"></div>
+        <button onclick="applyBackground()">OK</button>
+    </div>
+
+    <!-- Caixa de diálogo do Top 10 -->
+    <div id="top10Dialog">
+        <p>Você entrou no Top 10!</p>
+        <p>Sua pontuação: <span id="top10Score"></span></p>
+        <input type="text" id="playerName" placeholder="Digite seu nome">
+        <button onclick="submitScore()">Enviar</button>
+    </div>
+
+    <!-- Final da Interface  -->
+
+    <script>
+        // Lógica de Animação 
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const birdImage = new Image();
+        const columnImage = new Image();
+        columnImage.src = 'column.jpeg';
+
+        const bird = {
+            x: 50,
+            y: canvas.height / 2,
+            width: 70,
+            height: 70,
+            gravity: 0.15,
+            lift: -6,
+            velocity: 1
+        };
+
+        const columns = [];
+        const columnWidth = 60;
+        const gapHeight = 300;
+        let score = 0;
+        let gameOver = false;
+        let gameStarted = false;
+        let rankingDisplayed = false;
+        let showScore = true; // Variável para controlar a exibição do score
+
+        function startGame() {
+            const characterSelect = document.getElementById('character');
+            birdImage.src = characterSelect.value;
+            document.getElementById('characterSelection').style.display = 'none';
+            document.getElementById('touchToStart').style.display = 'none';
+            showScore = document.getElementById('showScoreCheckbox').checked; // Atualiza a variável showScore
+
+            // Fecha a caixa do menu se estiver aberta
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'flex') {
+                buttonContainer.style.display = 'none';
+            }
+
+            // Inicia o jogo
+            gameStarted = true;
+            restartGame();
+        }
+
+        function drawBird() {
+            ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height);
+        }
+
+        function drawColumn(column) {
+            ctx.drawImage(columnImage, column.x, column.gapY + gapHeight, columnWidth, canvas.height - column.gapY - gapHeight);
+            ctx.save();
+            ctx.scale(1, -1);
+            ctx.drawImage(columnImage, column.x, -column.gapY, columnWidth, column.gapY);
+            ctx.restore();
+        }
+
+        function updateColumns() {
+            for (let i = columns.length - 1; i >= 0; i--) {
+                const column = columns[i];
+                column.x -= 3;
+                if (column.x + columnWidth < 0) {
+                    columns.splice(i, 1);
+                    score++;
+                }
+                drawColumn(column);
+                if (
+                    bird.x + bird.width > column.x &&
+                    bird.x < column.x + columnWidth &&
+                    (bird.y < column.gapY || bird.y + bird.height > column.gapY + gapHeight)
+                ) {
+                    gameOver = true;
+                }
+            }
+
+            if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
+                const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
+                columns.push({ x: canvas.width, gapY });
+            }
+        }
+
+        function updateBird() {
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            if (bird.y + bird.height > canvas.height || bird.y < 0) {
+                gameOver = true;
+            }
+        }
+
+        function restartGame() {
+            bird.y = canvas.height / 2;
+            bird.velocity = 0;
+            columns.length = 0;
+            score = 0;
+            gameOver = false;
+            rankingDisplayed = false;
+            document.getElementById('gameOverText').style.display = 'none';
+            document.getElementById('rankingText').style.display = 'none';
+            animate();
+        }
+
+        async function displayRanking() {
+            const topScores = await getTopScores();
+            let rankingText = "Top 10 Scores:\n";
+            topScores.forEach((entry, index) => {
+                rankingText += `${index + 1}. ${entry.name}: ${entry.score}\n`;
+            });
+
+            rankingText += `\nSua pontuação: ${score}`;
+            document.getElementById('rankingText').innerText = rankingText;
+
+            rankingDisplayed = true;
+        }
+
+        function toggleRanking() {
+            const rankingText = document.getElementById('rankingText');
+            if (rankingText.style.display === 'none' || rankingText.style.display === '') {
+                displayRanking();
+                rankingText.style.display = 'block';
+            } else {
+                rankingText.style.display = 'none';
+            }
+        }
+
+        async function saveAndDisplayRanking() {
+            const topScores = await getTopScores();
+
+            if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
+                document.getElementById('top10Score').textContent = score;
+                document.getElementById('top10Dialog').style.display = 'block';
+            } else {
+                console.log("Score muito baixo para entrar no top 10.");
+                displayRanking();
+            }
+        }
+
+        async function submitScore() {
+            const playerName = document.getElementById('playerName').value;
+            if (playerName) {
+                try {
+                    await saveScore(playerName, score);
+                    document.getElementById('top10Dialog').style.display = 'none';
+                    displayRanking();
+                } catch (error) {
+                    console.error("Erro ao salvar score:", error);
+                    alert("Ocorreu um erro ao salvar o score. Tente novamente.");
+                }
+            } else {
+                alert("Nome inválido! O score não foi salvo.");
+            }
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateBird();
+            drawBird();
+            updateColumns();
+
+            if (showScore) {
+                ctx.fillStyle = 'white';
+                ctx.font = '24px Arial';
+                ctx.fillText('Score: ' + score, 10, 30);
+            }
+
+            if (!gameOver) {
+                requestAnimationFrame(animate);
+            } else {
+                document.getElementById('gameOverText').style.display = 'block';
+                document.getElementById('touchToStart').style.display = 'block';
+                saveAndDisplayRanking();
+            }
+        }
+
+        document.getElementById('startButton').addEventListener('click', () => {
+            if (!gameStarted) {
+                gameStarted = true;
+                document.getElementById('touchToStart').style.display = 'none';
+                restartGame();
+            } else if (gameOver) {
+                restartGame();
+                document.getElementById('touchToStart').style.display = 'none';
+            }
+
+            // Fecha o menu ao clicar em "Start"
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'flex') {
+                buttonContainer.style.display = 'none';
+            }
+        });
+
+        canvas.addEventListener('click', (event) => {
+            bird.velocity = bird.lift;
+        });
+
+        // Função para alternar a música
+        function toggleMusic() {
+            const music = document.getElementById('backgroundMusic');
+            const musicCheckbox = document.getElementById('musicCheckbox');
+
+            if (musicCheckbox.checked) {
+                music.play();
+            } else {
+                music.pause();
+            }
+        }
+
+        // Função para mostrar a seleção de personagem
+        function showCharacterSelection() {
+            document.getElementById('characterSelection').style.display = 'block';
+        }
+
+        // Função para mostrar a seleção de fundo
+        function showBackgroundSelection() {
+            document.getElementById('backgroundSelection').style.display = 'block';
+            updateBackgroundPreview();
+        }
+
+        // Função para atualizar a prévia do fundo
+        function updateBackgroundPreview() {
+            const backgroundSelect = document.getElementById('backgroundSelect');
+            const backgroundPreview = document.getElementById('backgroundPreview');
+            backgroundPreview.style.backgroundImage = `url('${backgroundSelect.value}')`;
+        }
+
+        // Função para aplicar o fundo selecionado
+        function applyBackground() {
+            const backgroundSelect = document.getElementById('backgroundSelect');
+            const backgroundDiv = document.getElementById('background');
+            backgroundDiv.style.backgroundImage = `url('${backgroundSelect.value}')`;
+            document.getElementById('backgroundSelection').style.display = 'none';
+        }
+
+        // Função para alternar a exibição do menu
+        function toggleMenu() {
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
+                buttonContainer.style.display = 'flex';
+            } else {
+                buttonContainer.style.display = 'none';
+            }
+        }
+
+        // Função para alternar a exibição do score
+        function toggleScoreDisplay() {
+            showScore = document.getElementById('showScoreCheckbox').checked;
+        }
+
+        // Começar com música parada
+        window.onload = () => {
+            const musicCheckbox = document.getElementById('musicCheckbox');
+            musicCheckbox.checked = false; // Música começa desligada
+        };
+    </script>
 </body>
 
 </html>

@@ -550,6 +550,11 @@
         const batImage = new Image();
         batImage.src = 'bat.png'; // Imagem do morcego
 
+        // Orb de energia
+        const orbImage = new Image();
+        orbImage.src = 'orb.png'; // Imagem do orb
+        let orb = null;
+
         function createBat(x, y) {
             for (let i = 0; i < 10; i++) { // Cria vários morcegos
                 bats.push({
@@ -584,6 +589,39 @@
                     bats.splice(index, 1);
                 }
             });
+        }
+
+        function createOrb() {
+            if (score > 0 && score % 15 === 0) {
+                const column = columns[columns.length - 1];
+                orb = {
+                    x: column.x + columnWidth / 2 - 25,
+                    y: column.gapY + gapHeight / 2 - 25,
+                    width: 50,
+                    height: 50
+                };
+            }
+        }
+
+        function drawOrb() {
+            if (orb) {
+                ctx.drawImage(orbImage, orb.x, orb.y, orb.width, orb.height);
+            }
+        }
+
+        function checkOrbCollision() {
+            if (orb && bird.x + bird.width > orb.x && bird.x < orb.x + orb.width &&
+                bird.y + bird.height > orb.y && bird.y < orb.y + orb.height) {
+                // Efeito de clarão
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                setTimeout(() => {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }, 100);
+
+                // Remove o orb
+                orb = null;
+            }
         }
 
         function startGame() {
@@ -623,6 +661,7 @@
                 if (column.x + columnWidth < 0) {
                     columns.splice(i, 1);
                     score++;
+                    createOrb();
                 }
                 drawColumn(column);
                 if (
@@ -717,6 +756,8 @@
             updateBird();
             drawBird();
             updateColumns();
+            drawOrb();
+            checkOrbCollision();
 
             if (showScore) {
                 ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#8B0000' : '#b8860b';

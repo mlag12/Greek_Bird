@@ -33,9 +33,7 @@
 
         window.saveScore = async function saveScore(name, score) {
             try {
-                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
-
-                // Verifique se o novo score é maior que o menor no top 10
+                const topScores = await getTopScores();
                 if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
                     await addDoc(collection(db, "scores"), {
                         name: name,
@@ -82,7 +80,6 @@
             top: 0;
             left: 0;
             z-index: 1;
-            transition: transform 0.5s ease; /* Transição suave para o modo 3D */
         }
 
         #gameOverText {
@@ -133,7 +130,6 @@
             text-align: center;
         }
 
-        /* Estilo do ícone de Menu */
         #menuIcon {
             position: absolute;
             top: 10px;
@@ -144,7 +140,6 @@
             z-index: 2;
         }
 
-        /* Estilo da caixa de botões */
         .button-container {
             position: absolute;
             top: 50px;
@@ -289,7 +284,6 @@
             border-radius: 5px;
         }
 
-        /* Estilo da caixa de diálogo do Top 10 */
         #top10Dialog {
             position: absolute;
             top: 50%;
@@ -336,7 +330,6 @@
             background-color: #a67c0a;
         }
 
-        /* Estilo da checkbox e label */
         #scoreToggle {
             display: flex;
             flex-direction: column;
@@ -458,15 +451,11 @@
         let gameStarted = false;
         let rankingDisplayed = false;
         let showScore = true;
+        let is3DMode = false; // Variável para controlar o modo 3D
 
         // Função para alternar o modo 3D
         function toggle3DMode() {
-            const is3D = document.getElementById('3dModeCheckbox').checked;
-            if (is3D) {
-                canvas.style.transform = "perspective(1000px) rotateX(20deg)";
-            } else {
-                canvas.style.transform = "none";
-            }
+            is3DMode = document.getElementById('3dModeCheckbox').checked;
         }
 
         function startGame() {
@@ -488,15 +477,33 @@
         }
 
         function drawBird() {
+            if (is3DMode) {
+                ctx.save();
+                ctx.translate(bird.x + bird.width / 2, bird.y + bird.height / 2);
+                ctx.scale(1, 1.2); // Aplica uma leve distorção para simular profundidade
+                ctx.translate(-(bird.x + bird.width / 2), -(bird.y + bird.height / 2));
+            }
             ctx.drawImage(birdImage, bird.x, bird.y, bird.width, bird.height);
+            if (is3DMode) {
+                ctx.restore();
+            }
         }
 
         function drawColumn(column) {
+            if (is3DMode) {
+                ctx.save();
+                ctx.translate(column.x + columnWidth / 2, column.gapY + gapHeight / 2);
+                ctx.scale(1, 1.1); // Aplica uma leve distorção para simular profundidade
+                ctx.translate(-(column.x + columnWidth / 2), -(column.gapY + gapHeight / 2));
+            }
             ctx.drawImage(columnImage, column.x, column.gapY + gapHeight, columnWidth, canvas.height - column.gapY - gapHeight);
             ctx.save();
             ctx.scale(1, -1);
             ctx.drawImage(columnImage, column.x, -column.gapY, columnWidth, column.gapY);
             ctx.restore();
+            if (is3DMode) {
+                ctx.restore();
+            }
         }
 
         function updateColumns() {

@@ -268,6 +268,7 @@
             border-radius: 10px;
             text-align: center;
             border: 2px solid #b8860b;
+            display: none;
         }
 
         body.dark-mode #characterSelection {
@@ -543,6 +544,36 @@
         let rankingDisplayed = false;
         let showScore = true;
 
+        // Efeitos de sangue
+        const bloodDrops = [];
+        const bloodColor = 'rgba(139, 0, 0, 0.8)';
+
+        function createBloodDrop(x, y) {
+            bloodDrops.push({
+                x: x,
+                y: y,
+                size: Math.random() * 10 + 5,
+                speedY: Math.random() * 2 + 1
+            });
+        }
+
+        function drawBloodDrops() {
+            bloodDrops.forEach((drop, index) => {
+                ctx.beginPath();
+                ctx.arc(drop.x, drop.y, drop.size, 0, Math.PI * 2);
+                ctx.fillStyle = bloodColor;
+                ctx.fill();
+
+                // Atualiza a posição do sangue
+                drop.y += drop.speedY;
+
+                // Remove o sangue quando ele sai da tela
+                if (drop.y > canvas.height) {
+                    bloodDrops.splice(index, 1);
+                }
+            });
+        }
+
         function startGame() {
             const characterSelect = document.getElementById('character');
             birdImage.src = characterSelect.value;
@@ -588,6 +619,7 @@
                     (bird.y < column.gapY || bird.y + bird.height > column.gapY + gapHeight)
                 ) {
                     gameOver = true;
+                    createBloodDrop(bird.x + bird.width / 2, bird.y + bird.height / 2); // Sangue ao colidir
                 }
             }
 
@@ -603,6 +635,7 @@
 
             if (bird.y + bird.height > canvas.height || bird.y < 0) {
                 gameOver = true;
+                createBloodDrop(bird.x + bird.width / 2, bird.y + bird.height / 2); // Sangue ao colidir
             }
         }
 
@@ -681,6 +714,11 @@
                 ctx.fillText('Score: ' + score, 10, 30);
             }
 
+            // Desenha o sangue
+            if (document.body.classList.contains('dark-mode')) {
+                drawBloodDrops();
+            }
+
             if (!gameOver) {
                 requestAnimationFrame(animate);
             } else {
@@ -737,6 +775,32 @@
             } else {
                 buttonContainer.style.display = 'none';
             }
+        }
+
+        // Função para mostrar a seleção de personagem
+        function showCharacterSelection() {
+            document.getElementById('characterSelection').style.display = 'block';
+        }
+
+        // Função para mostrar a seleção de fundo
+        function showBackgroundSelection() {
+            document.getElementById('backgroundSelection').style.display = 'block';
+            updateBackgroundPreview();
+        }
+
+        // Função para atualizar a prévia do fundo
+        function updateBackgroundPreview() {
+            const backgroundSelect = document.getElementById('backgroundSelect');
+            const backgroundPreview = document.getElementById('backgroundPreview');
+            backgroundPreview.style.backgroundImage = `url('${backgroundSelect.value}')`;
+        }
+
+        // Função para aplicar o fundo selecionado
+        function applyBackground() {
+            const backgroundSelect = document.getElementById('backgroundSelect');
+            const backgroundDiv = document.getElementById('background');
+            backgroundDiv.style.backgroundImage = `url('${backgroundSelect.value}')`;
+            document.getElementById('backgroundSelection').style.display = 'none';
         }
 
         // Começar com música parada

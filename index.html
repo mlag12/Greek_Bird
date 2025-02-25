@@ -343,7 +343,13 @@
             margin-top: 10px;
         }
 
-        #scoreToggle label {
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-container label {
             font-size: 18px;
             color: #b8860b;
         }
@@ -371,10 +377,14 @@
         <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
         <button id="backgroundButton" onclick="showBackgroundSelection()">Fundos</button>
         <div id="scoreToggle">
-            <label for="showScoreCheckbox">Mostrar Score:</label>
-            <input type="checkbox" id="showScoreCheckbox" checked onchange="toggleScoreDisplay()">
-            <label for="musicCheckbox">Música:</label>
-            <input type="checkbox" id="musicCheckbox" onchange="toggleMusic()">
+            <div class="checkbox-container">
+                <input type="checkbox" id="showScoreCheckbox" checked onchange="toggleScoreDisplay()">
+                <label for="showScoreCheckbox">Mostrar Score</label>
+            </div>
+            <div class="checkbox-container">
+                <input type="checkbox" id="musicCheckbox" onchange="toggleMusic()">
+                <label for="musicCheckbox">Música</label>
+            </div>
         </div>
     </div>
 

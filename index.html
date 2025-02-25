@@ -729,6 +729,16 @@
             document.body.classList.toggle('dark-mode', darkCheckbox.checked);
         }
 
+        // Função para alternar a exibição do menu
+        function toggleMenu() {
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
+                buttonContainer.style.display = 'flex';
+            } else {
+                buttonContainer.style.display = 'none';
+            }
+        }
+
         // Começar com música parada
         window.onload = () => {
             const musicCheckbox = document.getElementById('musicCheckbox');

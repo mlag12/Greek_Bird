@@ -52,15 +52,17 @@
     </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Greek Bird</title>
+    <title>Greek Bird - Dark Mode</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&family=MedievalSharp&display=swap');
 
         body {
-            font-family: 'GFS Didot', serif;
+            font-family: 'MedievalSharp', cursive;
             margin: 0;
             padding: 0;
             overflow: hidden;
+            background-color: #000;
+            color: #8B0000;
         }
 
         #background {
@@ -69,7 +71,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('background.jpeg');
+            background-image: url('dark-background.jpg'); /* Fundo escuro */
             background-size: cover;
             background-position: center;
             z-index: 0;
@@ -90,11 +92,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 48px;
-            font-family: 'GFS Didot', serif;
-            color: #b8860b;
+            font-family: 'MedievalSharp', cursive;
+            color: #8B0000;
             display: none;
             z-index: 2;
             white-space: nowrap;
+            text-shadow: 0 0 10px #FF0000;
         }
 
         #touchToStart {
@@ -103,11 +106,12 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 36px;
-            font-family: 'GFS Didot', serif;
-            color: #b8860b;
+            font-family: 'MedievalSharp', cursive;
+            color: #8B0000;
             display: block;
             z-index: 2;
             white-space: nowrap;
+            text-shadow: 0 0 10px #FF0000;
         }
 
         #rankingText {
@@ -115,19 +119,19 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(255, 223, 186, 0.9);
-            border: 4px solid #8B4513;
+            background: rgba(0, 0, 0, 0.9);
+            border: 4px solid #8B0000;
             padding: 20px;
             display: none;
-            z-index: 3; /* Z-index maior para sobrepor o menu */
+            z-index: 3;
             white-space: pre-line;
             max-height: 80vh;
             overflow-y: auto;
             border-radius: 10px;
-            font-family: 'GFS Didot', serif;
+            font-family: 'MedievalSharp', cursive;
             font-size: 18px;
-            color: rgb(247, 151, 9);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            color: #8B0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
             width: 300px;
             text-align: center;
         }
@@ -138,9 +142,10 @@
             top: 10px;
             right: 10px;
             font-size: 30px;
-            color: #b8860b;
+            color: #8B0000;
             cursor: pointer;
             z-index: 2;
+            text-shadow: 0 0 10px #FF0000;
         }
 
         /* Estilo da caixa de botões */
@@ -152,45 +157,49 @@
             flex-direction: column;
             gap: 10px;
             z-index: 2;
-            display: none; /* Inicialmente oculto */
-            background: rgba(255, 223, 186, 0.9);
-            border: 4px solid #8B4513;
+            display: none;
+            background: rgba(0, 0, 0, 0.9);
+            border: 4px solid #8B0000;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            width: 200px; /* Largura aumentada */
-            align-items: center; /* Centraliza os itens horizontalmente */
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            width: 200px;
+            align-items: center;
         }
 
         .button-container button {
             font-size: 20px;
-            font-family: 'GFS Didot', serif;
-            color: #b8860b;
-            background-color: #ffffff;
-            border: 2px solid #b8860b;
+            font-family: 'MedievalSharp', cursive;
+            color: #8B0000;
+            background-color: #000;
+            border: 2px solid #8B0000;
             padding: 5px 10px;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
             border-radius: 5px;
             text-align: center;
-            width: 100%; /* Faz os botões ocuparem a largura total */
+            width: 100%;
         }
 
         .button-container button:hover {
-            background-color: #b8860b;
-            color: white;
+            background-color: #8B0000;
+            color: #000;
         }
 
         #startButton {
             font-size: 24px;
             padding: 10px 20px;
-            background-color: #b8860b;
-            color: white;
+            background-color: #8B0000;
+            color: #000;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
             transition: background-color 0.3s;
+        }
+
+        #startButton:hover {
+            background-color: #FF0000;
         }
 
         #characterSelection {
@@ -199,30 +208,33 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 3;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(0, 0, 0, 0.9);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            border: 2px solid #b8860b;
+            border: 2px solid #8B0000;
         }
 
         #characterSelection label {
             font-size: 20px;
             margin-right: 10px;
+            color: #8B0000;
         }
 
         #characterSelection select {
             font-size: 18px;
             padding: 5px;
-            border: 2px solid #b8860b;
+            border: 2px solid #8B0000;
             border-radius: 5px;
+            background-color: #000;
+            color: #8B0000;
         }
 
         #characterSelection button {
             font-size: 18px;
             padding: 5px 10px;
-            background-color: #b8860b;
-            color: white;
+            background-color: #8B0000;
+            color: #000;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -230,7 +242,7 @@
         }
 
         #characterSelection button:hover {
-            background-color: #a67c0a;
+            background-color: #FF0000;
         }
 
         #backgroundSelection {
@@ -239,35 +251,38 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 3;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(0, 0, 0, 0.9);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            border: 2px solid #b8860b;
+            border: 2px solid #8B0000;
             display: none;
-            width: 80%; /* Largura aumentada */
-            max-width: 600px; /* Largura máxima */
+            width: 80%;
+            max-width: 600px;
         }
 
         #backgroundSelection label {
             font-size: 20px;
             margin-right: 10px;
+            color: #8B0000;
         }
 
         #backgroundSelection select {
             font-size: 18px;
             padding: 5px;
-            border: 2px solid #b8860b;
+            border: 2px solid #8B0000;
             border-radius: 5px;
-            width: 100%; /* Largura total */
+            background-color: #000;
+            color: #8B0000;
+            width: 100%;
             margin-bottom: 20px;
         }
 
         #backgroundSelection button {
             font-size: 18px;
             padding: 10px 20px;
-            background-color: #b8860b;
-            color: white;
+            background-color: #8B0000;
+            color: #000;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -275,64 +290,17 @@
         }
 
         #backgroundSelection button:hover {
-            background-color: #a67c0a;
+            background-color: #FF0000;
         }
 
         #backgroundPreview {
-            width: 100%; /* Largura total */
-            height: 300px; /* Altura aumentada */
+            width: 100%;
+            height: 300px;
             margin: 10px auto;
             background-size: cover;
             background-position: center;
-            border: 2px solid #b8860b;
+            border: 2px solid #8B0000;
             border-radius: 5px;
-        }
-
-        /* Estilo da caixa de diálogo do Top 10 */
-        #top10Dialog {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 223, 186, 0.9);
-            border: 4px solid #8B4513;
-            padding: 20px;
-            display: none;
-            z-index: 4; /* Z-index maior para sobrepor tudo */
-            white-space: pre-line;
-            max-height: 80vh;
-            overflow-y: auto;
-            border-radius: 10px;
-            font-family: 'GFS Didot', serif;
-            font-size: 36px; /* Tamanho da fonte aumentado */
-            color: rgb(247, 151, 9);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            width: 400px; /* Largura aumentada para acomodar o texto maior */
-            text-align: center;
-        }
-
-        #top10Dialog input {
-            font-size: 18px;
-            padding: 10px;
-            margin-top: 10px;
-            width: 80%;
-            border: 2px solid #8B4513;
-            border-radius: 5px;
-        }
-
-        #top10Dialog button {
-            font-size: 18px;
-            padding: 10px 20px;
-            background-color: #b8860b;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        #top10Dialog button:hover {
-            background-color: #a67c0a;
         }
 
         /* Estilo da checkbox e label */
@@ -351,13 +319,17 @@
 
         .checkbox-container label {
             font-size: 18px;
-            color: #b8860b;
+            color: #8B0000;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            accent-color: #8B0000;
         }
     </style>
 </head>
 
 <body>
-    <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
+    <audio id="backgroundMusic" src="dark-music.mp3" loop></audio>
 
     <!-- Interface com usuário  -->
     <div id="background"></div>
@@ -386,8 +358,8 @@
                 <label for="musicCheckbox">Música</label>
             </div>
             <div class="checkbox-container">
-                <input type="checkbox" id="transcendentalCheckbox" onchange="toggleTranscendentalMode()">
-                <label for="transcendentalCheckbox">Modo Transcendental</label>
+                <input type="checkbox" id="darkCheckbox" onchange="toggleDarkMode()">
+                <label for="darkCheckbox">Dark</label>
             </div>
         </div>
     </div>
@@ -396,11 +368,10 @@
     <div id="characterSelection">
         <label for="character">Escolha seu personagem:</label>
         <select id="character">
-            <option value="socrates.png">Sócrates</option>
-            <option value="nietzsche.png">Nietzsche</option>
-            <option value="diogenes.png">Diógenes</option>
-            <option value="kant.png">Kant</option>
-            <option value="olavo.png">Olavo</option> <!-- Novo personagem -->
+            <option value="vampire.png">Vampiro</option>
+            <option value="witch.png">Bruxa</option>
+            <option value="ghost.png">Fantasma</option>
+            <option value="werewolf.png">Lobisomem</option>
         </select>
         <button onclick="startGame()">Jogar</button>
     </div>
@@ -409,10 +380,9 @@
     <div id="backgroundSelection">
         <label for="backgroundSelect">Escolha o fundo:</label>
         <select id="backgroundSelect" onchange="updateBackgroundPreview()">
-            <option value="background.jpeg">Ágora</option>
-            <option value="background2.jpeg">Jardins</option> 
-            <option value="background3.jpeg">Oráculo</option>
-            <option value="background4.jpeg">Alpes</option> <!-- Novo fundo -->
+            <option value="dark-background.jpg">Castelo Sombrio</option>
+            <option value="cemetery.jpg">Cemitério</option>
+            <option value="forest.jpg">Floresta Assustadora</option>
         </select>
         <div id="backgroundPreview"></div>
         <button onclick="applyBackground()">OK</button>
@@ -437,7 +407,7 @@
 
         const birdImage = new Image();
         const columnImage = new Image();
-        columnImage.src = 'column.jpeg';
+        columnImage.src = 'dark-column.png';
 
         const bird = {
             x: 50,
@@ -456,51 +426,15 @@
         let gameOver = false;
         let gameStarted = false;
         let rankingDisplayed = false;
-        let showScore = true; // Variável para controlar a exibição do score
-        let transcendentalMode = false; // Variável para controlar o modo Transcendental
-
-        // Partículas para o modo Transcendental
-        const particles = [];
-        const particleCount = 100;
-
-        function createParticles() {
-            for (let i = 0; i < particleCount; i++) {
-                particles.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    size: Math.random() * 5 + 2,
-                    speedX: (Math.random() - 0.5) * 2,
-                    speedY: (Math.random() - 0.5) * 2,
-                    color: `rgba(${Math.random() * 255}, ${Math.random() * 255}, ${Math.random() * 255}, 0.8)`
-                });
-            }
-        }
-
-        function drawParticles() {
-            particles.forEach(particle => {
-                ctx.beginPath();
-                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                ctx.fillStyle = particle.color;
-                ctx.fill();
-
-                // Atualiza a posição das partículas
-                particle.x += particle.speedX;
-                particle.y += particle.speedY;
-
-                // Faz as partículas reaparecerem do outro lado da tela
-                if (particle.x < 0) particle.x = canvas.width;
-                if (particle.x > canvas.width) particle.x = 0;
-                if (particle.y < 0) particle.y = canvas.height;
-                if (particle.y > canvas.height) particle.y = 0;
-            });
-        }
+        let showScore = true;
+        let darkMode = false;
 
         function startGame() {
             const characterSelect = document.getElementById('character');
             birdImage.src = characterSelect.value;
             document.getElementById('characterSelection').style.display = 'none';
             document.getElementById('touchToStart').style.display = 'none';
-            showScore = document.getElementById('showScoreCheckbox').checked; // Atualiza a variável showScore
+            showScore = document.getElementById('showScoreCheckbox').checked;
 
             // Fecha a caixa do menu se estiver aberta
             const buttonContainer = document.querySelector('.button-container');
@@ -628,18 +562,9 @@
             updateColumns();
 
             if (showScore) {
-                ctx.fillStyle = 'white';
-                ctx.font = '24px Arial';
+                ctx.fillStyle = '#8B0000';
+                ctx.font = '24px MedievalSharp';
                 ctx.fillText('Score: ' + score, 10, 30);
-            }
-
-            if (transcendentalMode) {
-                // Efeitos visuais no modo Transcendental
-                drawParticles();
-                ctx.globalAlpha = 0.5;
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.globalAlpha = 1;
             }
 
             if (!gameOver) {
@@ -684,52 +609,18 @@
             }
         }
 
-        // Função para mostrar a seleção de personagem
-        function showCharacterSelection() {
-            document.getElementById('characterSelection').style.display = 'block';
-        }
+        // Função para alternar o modo Dark
+        function toggleDarkMode() {
+            darkMode = document.getElementById('darkCheckbox').checked;
+            const body = document.body;
+            const background = document.getElementById('background');
 
-        // Função para mostrar a seleção de fundo
-        function showBackgroundSelection() {
-            document.getElementById('backgroundSelection').style.display = 'block';
-            updateBackgroundPreview();
-        }
-
-        // Função para atualizar a prévia do fundo
-        function updateBackgroundPreview() {
-            const backgroundSelect = document.getElementById('backgroundSelect');
-            const backgroundPreview = document.getElementById('backgroundPreview');
-            backgroundPreview.style.backgroundImage = `url('${backgroundSelect.value}')`;
-        }
-
-        // Função para aplicar o fundo selecionado
-        function applyBackground() {
-            const backgroundSelect = document.getElementById('backgroundSelect');
-            const backgroundDiv = document.getElementById('background');
-            backgroundDiv.style.backgroundImage = `url('${backgroundSelect.value}')`;
-            document.getElementById('backgroundSelection').style.display = 'none';
-        }
-
-        // Função para alternar a exibição do menu
-        function toggleMenu() {
-            const buttonContainer = document.querySelector('.button-container');
-            if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
-                buttonContainer.style.display = 'flex';
+            if (darkMode) {
+                body.style.backgroundColor = '#000';
+                background.style.backgroundImage = "url('dark-background.jpg')";
             } else {
-                buttonContainer.style.display = 'none';
-            }
-        }
-
-        // Função para alternar a exibição do score
-        function toggleScoreDisplay() {
-            showScore = document.getElementById('showScoreCheckbox').checked;
-        }
-
-        // Função para alternar o modo Transcendental
-        function toggleTranscendentalMode() {
-            transcendentalMode = document.getElementById('transcendentalCheckbox').checked;
-            if (transcendentalMode) {
-                createParticles();
+                body.style.backgroundColor = '#FFF';
+                background.style.backgroundImage = "url('background.jpeg')";
             }
         }
 

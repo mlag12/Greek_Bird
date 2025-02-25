@@ -54,18 +54,318 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Greek Bird</title>
     <style>
-        /* Estilos mantidos iguais */
+        @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
+
+        body {
+            font-family: 'GFS Didot', serif;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('background.jpeg');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
+        }
+
+        canvas {
+            display: block;
+            background-color: transparent;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        #gameOverText {
+            position: absolute;
+            top: 30%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 48px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            display: none;
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        #touchToStart {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 36px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            display: block;
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        #rankingText {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 223, 186, 0.9);
+            border: 4px solid #8B4513;
+            padding: 20px;
+            display: none;
+            z-index: 3; /* Z-index maior para sobrepor o menu */
+            white-space: pre-line;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            font-family: 'GFS Didot', serif;
+            font-size: 18px;
+            color: rgb(247, 151, 9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 300px;
+            text-align: center;
+        }
+
+        /* Estilo do ícone de Menu */
+        #menuIcon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 30px;
+            color: #b8860b;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        /* Estilo da caixa de botões */
+        .button-container {
+            position: absolute;
+            top: 50px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 2;
+            display: none; /* Inicialmente oculto */
+            background: rgba(255, 223, 186, 0.9);
+            border: 4px solid #8B4513;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 200px; /* Largura aumentada */
+            align-items: center; /* Centraliza os itens horizontalmente */
+        }
+
+        .button-container button {
+            font-size: 20px;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            background-color: #ffffff;
+            border: 2px solid #b8860b;
+            padding: 5px 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+            width: 100%; /* Faz os botões ocuparem a largura total */
+        }
+
+        .button-container button:hover {
+            background-color: #b8860b;
+            color: white;
+        }
+
+        #startButton {
+            font-size: 24px;
+            padding: 10px 20px;
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+
+        #characterSelection {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #b8860b;
+        }
+
+        #characterSelection label {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        #characterSelection select {
+            font-size: 18px;
+            padding: 5px;
+            border: 2px solid #b8860b;
+            border-radius: 5px;
+        }
+
+        #characterSelection button {
+            font-size: 18px;
+            padding: 5px 10px;
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #characterSelection button:hover {
+            background-color: #a67c0a;
+        }
+
+        #backgroundSelection {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #b8860b;
+            display: none;
+            width: 80%; /* Largura aumentada */
+            max-width: 600px; /* Largura máxima */
+        }
+
+        #backgroundSelection label {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        #backgroundSelection select {
+            font-size: 18px;
+            padding: 5px;
+            border: 2px solid #b8860b;
+            border-radius: 5px;
+            width: 100%; /* Largura total */
+            margin-bottom: 20px;
+        }
+
+        #backgroundSelection button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #backgroundSelection button:hover {
+            background-color: #a67c0a;
+        }
+
+        #backgroundPreview {
+            width: 100%; /* Largura total */
+            height: 300px; /* Altura aumentada */
+            margin: 10px auto;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid #b8860b;
+            border-radius: 5px;
+        }
+
+        /* Estilo da caixa de diálogo do Top 10 */
+        #top10Dialog {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 223, 186, 0.9);
+            border: 4px solid #8B4513;
+            padding: 20px;
+            display: none;
+            z-index: 4; /* Z-index maior para sobrepor tudo */
+            white-space: pre-line;
+            max-height: 80vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            font-family: 'GFS Didot', serif;
+            font-size: 36px; /* Tamanho da fonte aumentado */
+            color: rgb(247, 151, 9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            width: 400px; /* Largura aumentada para acomodar o texto maior */
+            text-align: center;
+        }
+
+        #top10Dialog input {
+            font-size: 18px;
+            padding: 10px;
+            margin-top: 10px;
+            width: 80%;
+            border: 2px solid #8B4513;
+            border-radius: 5px;
+        }
+
+        #top10Dialog button {
+            font-size: 18px;
+            padding: 10px 20px;
+            background-color: #b8860b;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        #top10Dialog button:hover {
+            background-color: #a67c0a;
+        }
+
+        /* Estilo da checkbox e label */
+        #scoreToggle {
+            display: flex;
+            align-items: center; /* Alinha horizontalmente */
+            gap: 10px; /* Espaço entre o texto e a checkbox */
+            margin-top: 10px;
+        }
+
+        #scoreToggle label {
+            font-size: 18px;
+            color: #b8860b;
+        }
     </style>
 </head>
 
 <body>
     <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
+
+    <!-- Interface com usuário  -->
     <div id="background"></div>
     <canvas id="gameCanvas"></canvas>
     <div id="gameOverText">Game Over</div>
-    <div id="touchToStart"><button id="startButton">Start</button></div>
+    <div id="touchToStart">
+        <button id="startButton"> Start </button>
+    </div>
     <div id="rankingText"></div>
+
+    <!-- Ícone de Menu -->
     <div id="menuIcon" onclick="toggleMenu()">☰</div>
+
+    <!-- Botões no canto superior direito -->
     <div class="button-container">
         <button id="musicToggle" onclick="toggleMusic()">Música: OFF</button>
         <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
@@ -76,6 +376,8 @@
             <input type="checkbox" id="showScoreCheckbox" checked onchange="toggleScoreDisplay()">
         </div>
     </div>
+
+    <!-- Caixa de seleção de personagem -->
     <div id="characterSelection">
         <label for="character">Escolha seu personagem:</label>
         <select id="character">
@@ -83,20 +385,24 @@
             <option value="nietzsche.png">Nietzsche</option>
             <option value="diogenes.png">Diógenes</option>
             <option value="kant.png">Kant</option>
-            <option value="olavo.png">Olavo</option>
+            <option value="olavo.png">Olavo</option> <!-- Novo personagem -->
         </select>
         <button onclick="startGame()">Jogar</button>
     </div>
+
+    <!-- Caixa de seleção de fundo -->
     <div id="backgroundSelection">
         <label for="backgroundSelect">Escolha o fundo:</label>
         <select id="backgroundSelect" onchange="updateBackgroundPreview()">
             <option value="background.jpeg">Ágora</option>
-            <option value="background2.jpeg">Jardins</option>
+            <option value="background2.jpeg">Jardins</option> 
             <option value="background3.jpeg">Oráculo</option>
         </select>
         <div id="backgroundPreview"></div>
         <button onclick="applyBackground()">OK</button>
     </div>
+
+    <!-- Caixa de diálogo do Top 10 -->
     <div id="top10Dialog">
         <p>Você entrou no Top 10!</p>
         <p>Sua pontuação: <span id="top10Score"></span></p>
@@ -104,7 +410,10 @@
         <button onclick="submitScore()">Enviar</button>
     </div>
 
+    <!-- Final da Interface  -->
+
     <script>
+        // Lógica de Animação 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -130,13 +439,23 @@
         let score = 0;
         let gameOver = false;
         let gameStarted = false;
-        let showScore = true;
+        let rankingDisplayed = false;
+        let showScore = true; // Variável para controlar a exibição do score
 
         function startGame() {
-            birdImage.src = document.getElementById('character').value;
+            const characterSelect = document.getElementById('character');
+            birdImage.src = characterSelect.value;
             document.getElementById('characterSelection').style.display = 'none';
             document.getElementById('touchToStart').style.display = 'none';
-            showScore = document.getElementById('showScoreCheckbox').checked;
+            showScore = document.getElementById('showScoreCheckbox').checked; // Atualiza a variável showScore
+
+            // Fecha a caixa do menu se estiver aberta
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'flex') {
+                buttonContainer.style.display = 'none';
+            }
+
+            // Inicia o jogo
             gameStarted = true;
             restartGame();
         }
@@ -192,6 +511,7 @@
             columns.length = 0;
             score = 0;
             gameOver = false;
+            rankingDisplayed = false;
             document.getElementById('gameOverText').style.display = 'none';
             document.getElementById('rankingText').style.display = 'none';
             animate();
@@ -203,8 +523,11 @@
             topScores.forEach((entry, index) => {
                 rankingText += `${index + 1}. ${entry.name}: ${entry.score}\n`;
             });
+
             rankingText += `\nSua pontuação: ${score}`;
             document.getElementById('rankingText').innerText = rankingText;
+
+            rankingDisplayed = true;
         }
 
         function toggleRanking() {
@@ -219,6 +542,7 @@
 
         async function saveAndDisplayRanking() {
             const topScores = await getTopScores();
+
             if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
                 document.getElementById('top10Score').textContent = score;
                 document.getElementById('top10Dialog').style.display = 'block';
@@ -231,9 +555,14 @@
         async function submitScore() {
             const playerName = document.getElementById('playerName').value;
             if (playerName) {
-                await saveScore(playerName, score);
-                document.getElementById('top10Dialog').style.display = 'none';
-                displayRanking();
+                try {
+                    await saveScore(playerName, score);
+                    document.getElementById('top10Dialog').style.display = 'none';
+                    displayRanking();
+                } catch (error) {
+                    console.error("Erro ao salvar score:", error);
+                    alert("Ocorreu um erro ao salvar o score. Tente novamente.");
+                }
             } else {
                 alert("Nome inválido! O score não foi salvo.");
             }
@@ -261,40 +590,61 @@
         }
 
         document.getElementById('startButton').addEventListener('click', () => {
-            if (!gameStarted || gameOver) {
-                startGame();
+            if (!gameStarted) {
+                gameStarted = true;
+                document.getElementById('touchToStart').style.display = 'none';
+                restartGame();
+            } else if (gameOver) {
+                restartGame();
+                document.getElementById('touchToStart').style.display = 'none';
+            }
+
+            // Fecha o menu ao clicar em "Start"
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'flex') {
+                buttonContainer.style.display = 'none';
             }
         });
 
-        canvas.addEventListener('click', () => bird.velocity = bird.lift);
+        canvas.addEventListener('click', (event) => {
+            bird.velocity = bird.lift;
+        });
 
+        // Função para alternar a música
         function toggleMusic() {
-            const music = document.getElementById('backgroundMusic');
             const musicButton = document.getElementById('musicToggle');
+            const music = document.getElementById('backgroundMusic');
+
             if (music.paused) {
                 music.play();
                 musicButton.textContent = "Música: ON";
+                musicPlaying = true;
             } else {
                 music.pause();
                 musicButton.textContent = "Música: OFF";
+                musicPlaying = false;
             }
         }
 
+        // Função para mostrar a seleção de personagem
         function showCharacterSelection() {
             document.getElementById('characterSelection').style.display = 'block';
         }
 
+        // Função para mostrar a seleção de fundo
         function showBackgroundSelection() {
             document.getElementById('backgroundSelection').style.display = 'block';
             updateBackgroundPreview();
         }
 
+        // Função para atualizar a prévia do fundo
         function updateBackgroundPreview() {
             const backgroundSelect = document.getElementById('backgroundSelect');
             const backgroundPreview = document.getElementById('backgroundPreview');
             backgroundPreview.style.backgroundImage = `url('${backgroundSelect.value}')`;
         }
 
+        // Função para aplicar o fundo selecionado
         function applyBackground() {
             const backgroundSelect = document.getElementById('backgroundSelect');
             const backgroundDiv = document.getElementById('background');
@@ -302,17 +652,25 @@
             document.getElementById('backgroundSelection').style.display = 'none';
         }
 
+        // Função para alternar a exibição do menu
         function toggleMenu() {
             const buttonContainer = document.querySelector('.button-container');
-            buttonContainer.style.display = buttonContainer.style.display === 'none' ? 'flex' : 'none';
+            if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
+                buttonContainer.style.display = 'flex';
+            } else {
+                buttonContainer.style.display = 'none';
+            }
         }
 
+        // Função para alternar a exibição do score
         function toggleScoreDisplay() {
             showScore = document.getElementById('showScoreCheckbox').checked;
         }
 
+        // Começar com música parada
         window.onload = () => {
             document.getElementById('musicToggle').textContent = "Música: OFF";
+            musicPlaying = false;
         };
     </script>
 </body>

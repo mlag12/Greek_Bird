@@ -54,13 +54,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Greek Bird - Dark Mode</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&family=MedievalSharp&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
 
         body {
-            font-family: 'MedievalSharp', cursive;
+            font-family: 'GFS Didot', serif;
             margin: 0;
             padding: 0;
             overflow: hidden;
+            background-color: #f0f0f0;
+            color: #b8860b;
+        }
+
+        body.dark-mode {
             background-color: #000;
             color: #8B0000;
         }
@@ -71,10 +76,14 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('dark-background.jpg'); /* Fundo escuro */
+            background-image: url('background.jpeg');
             background-size: cover;
             background-position: center;
             z-index: 0;
+        }
+
+        body.dark-mode #background {
+            filter: brightness(0.5) contrast(1.2);
         }
 
         canvas {
@@ -92,11 +101,15 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 48px;
-            font-family: 'MedievalSharp', cursive;
-            color: #8B0000;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
             display: none;
             z-index: 2;
             white-space: nowrap;
+        }
+
+        body.dark-mode #gameOverText {
+            color: #8B0000;
             text-shadow: 0 0 10px #FF0000;
         }
 
@@ -106,11 +119,15 @@
             left: 50%;
             transform: translate(-50%, -50%);
             font-size: 36px;
-            font-family: 'MedievalSharp', cursive;
-            color: #8B0000;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
             display: block;
             z-index: 2;
             white-space: nowrap;
+        }
+
+        body.dark-mode #touchToStart {
+            color: #8B0000;
             text-shadow: 0 0 10px #FF0000;
         }
 
@@ -119,8 +136,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.9);
-            border: 4px solid #8B0000;
+            background: rgba(255, 223, 186, 0.9);
+            border: 4px solid #8B4513;
             padding: 20px;
             display: none;
             z-index: 3;
@@ -128,12 +145,19 @@
             max-height: 80vh;
             overflow-y: auto;
             border-radius: 10px;
-            font-family: 'MedievalSharp', cursive;
+            font-family: 'GFS Didot', serif;
             font-size: 18px;
-            color: #8B0000;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            color: rgb(247, 151, 9);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             width: 300px;
             text-align: center;
+        }
+
+        body.dark-mode #rankingText {
+            background: rgba(0, 0, 0, 0.9);
+            border: 4px solid #8B0000;
+            color: #8B0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
         }
 
         /* Estilo do ícone de Menu */
@@ -142,9 +166,13 @@
             top: 10px;
             right: 10px;
             font-size: 30px;
-            color: #8B0000;
+            color: #b8860b;
             cursor: pointer;
             z-index: 2;
+        }
+
+        body.dark-mode #menuIcon {
+            color: #8B0000;
             text-shadow: 0 0 10px #FF0000;
         }
 
@@ -158,30 +186,48 @@
             gap: 10px;
             z-index: 2;
             display: none;
-            background: rgba(0, 0, 0, 0.9);
-            border: 4px solid #8B0000;
+            background: rgba(255, 223, 186, 0.9);
+            border: 4px solid #8B4513;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             width: 200px;
             align-items: center;
         }
 
+        body.dark-mode .button-container {
+            background: rgba(0, 0, 0, 0.9);
+            border: 4px solid #8B0000;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+
         .button-container button {
             font-size: 20px;
-            font-family: 'MedievalSharp', cursive;
-            color: #8B0000;
-            background-color: #000;
-            border: 2px solid #8B0000;
+            font-family: 'GFS Didot', serif;
+            color: #b8860b;
+            background-color: #ffffff;
+            border: 2px solid #b8860b;
             padding: 5px 10px;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             border-radius: 5px;
             text-align: center;
             width: 100%;
         }
 
+        body.dark-mode .button-container button {
+            color: #8B0000;
+            background-color: #000;
+            border: 2px solid #8B0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
         .button-container button:hover {
+            background-color: #b8860b;
+            color: white;
+        }
+
+        body.dark-mode .button-container button:hover {
             background-color: #8B0000;
             color: #000;
         }
@@ -189,16 +235,25 @@
         #startButton {
             font-size: 24px;
             padding: 10px 20px;
-            background-color: #8B0000;
-            color: #000;
+            background-color: #b8860b;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             transition: background-color 0.3s;
         }
 
+        body.dark-mode #startButton {
+            background-color: #8B0000;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+        }
+
         #startButton:hover {
+            background-color: #a67c0a;
+        }
+
+        body.dark-mode #startButton:hover {
             background-color: #FF0000;
         }
 
@@ -208,40 +263,63 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 3;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
+            border: 2px solid #b8860b;
+        }
+
+        body.dark-mode #characterSelection {
+            background: rgba(0, 0, 0, 0.9);
             border: 2px solid #8B0000;
         }
 
         #characterSelection label {
             font-size: 20px;
             margin-right: 10px;
+            color: #b8860b;
+        }
+
+        body.dark-mode #characterSelection label {
             color: #8B0000;
         }
 
         #characterSelection select {
             font-size: 18px;
             padding: 5px;
-            border: 2px solid #8B0000;
+            border: 2px solid #b8860b;
             border-radius: 5px;
+            background-color: #ffffff;
+            color: #b8860b;
+        }
+
+        body.dark-mode #characterSelection select {
             background-color: #000;
+            border: 2px solid #8B0000;
             color: #8B0000;
         }
 
         #characterSelection button {
             font-size: 18px;
             padding: 5px 10px;
-            background-color: #8B0000;
-            color: #000;
+            background-color: #b8860b;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 10px;
         }
 
+        body.dark-mode #characterSelection button {
+            background-color: #8B0000;
+        }
+
         #characterSelection button:hover {
+            background-color: #a67c0a;
+        }
+
+        body.dark-mode #characterSelection button:hover {
             background-color: #FF0000;
         }
 
@@ -251,45 +329,68 @@
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 3;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(255, 255, 255, 0.9);
             padding: 20px;
             border-radius: 10px;
             text-align: center;
-            border: 2px solid #8B0000;
+            border: 2px solid #b8860b;
             display: none;
             width: 80%;
             max-width: 600px;
         }
 
+        body.dark-mode #backgroundSelection {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid #8B0000;
+        }
+
         #backgroundSelection label {
             font-size: 20px;
             margin-right: 10px;
+            color: #b8860b;
+        }
+
+        body.dark-mode #backgroundSelection label {
             color: #8B0000;
         }
 
         #backgroundSelection select {
             font-size: 18px;
             padding: 5px;
-            border: 2px solid #8B0000;
+            border: 2px solid #b8860b;
             border-radius: 5px;
-            background-color: #000;
-            color: #8B0000;
+            background-color: #ffffff;
+            color: #b8860b;
             width: 100%;
             margin-bottom: 20px;
+        }
+
+        body.dark-mode #backgroundSelection select {
+            background-color: #000;
+            border: 2px solid #8B0000;
+            color: #8B0000;
         }
 
         #backgroundSelection button {
             font-size: 18px;
             padding: 10px 20px;
-            background-color: #8B0000;
-            color: #000;
+            background-color: #b8860b;
+            color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             margin-top: 10px;
         }
 
+        body.dark-mode #backgroundSelection button {
+            background-color: #8B0000;
+        }
+
         #backgroundSelection button:hover {
+            background-color: #a67c0a;
+        }
+
+        body.dark-mode #backgroundSelection button:hover {
             background-color: #FF0000;
         }
 
@@ -299,8 +400,12 @@
             margin: 10px auto;
             background-size: cover;
             background-position: center;
-            border: 2px solid #8B0000;
+            border: 2px solid #b8860b;
             border-radius: 5px;
+        }
+
+        body.dark-mode #backgroundPreview {
+            border: 2px solid #8B0000;
         }
 
         /* Estilo da checkbox e label */
@@ -319,17 +424,25 @@
 
         .checkbox-container label {
             font-size: 18px;
+            color: #b8860b;
+        }
+
+        body.dark-mode .checkbox-container label {
             color: #8B0000;
         }
 
         .checkbox-container input[type="checkbox"] {
+            accent-color: #b8860b;
+        }
+
+        body.dark-mode .checkbox-container input[type="checkbox"] {
             accent-color: #8B0000;
         }
     </style>
 </head>
 
 <body>
-    <audio id="backgroundMusic" src="dark-music.mp3" loop></audio>
+    <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
 
     <!-- Interface com usuário  -->
     <div id="background"></div>
@@ -368,10 +481,11 @@
     <div id="characterSelection">
         <label for="character">Escolha seu personagem:</label>
         <select id="character">
-            <option value="vampire.png">Vampiro</option>
-            <option value="witch.png">Bruxa</option>
-            <option value="ghost.png">Fantasma</option>
-            <option value="werewolf.png">Lobisomem</option>
+            <option value="socrates.png">Sócrates</option>
+            <option value="nietzsche.png">Nietzsche</option>
+            <option value="diogenes.png">Diógenes</option>
+            <option value="kant.png">Kant</option>
+            <option value="olavo.png">Olavo</option>
         </select>
         <button onclick="startGame()">Jogar</button>
     </div>
@@ -380,9 +494,10 @@
     <div id="backgroundSelection">
         <label for="backgroundSelect">Escolha o fundo:</label>
         <select id="backgroundSelect" onchange="updateBackgroundPreview()">
-            <option value="dark-background.jpg">Castelo Sombrio</option>
-            <option value="cemetery.jpg">Cemitério</option>
-            <option value="forest.jpg">Floresta Assustadora</option>
+            <option value="background.jpeg">Ágora</option>
+            <option value="background2.jpeg">Jardins</option>
+            <option value="background3.jpeg">Oráculo</option>
+            <option value="background4.jpeg">Alpes</option>
         </select>
         <div id="backgroundPreview"></div>
         <button onclick="applyBackground()">OK</button>
@@ -407,7 +522,7 @@
 
         const birdImage = new Image();
         const columnImage = new Image();
-        columnImage.src = 'dark-column.png';
+        columnImage.src = 'column.jpeg';
 
         const bird = {
             x: 50,
@@ -427,7 +542,6 @@
         let gameStarted = false;
         let rankingDisplayed = false;
         let showScore = true;
-        let darkMode = false;
 
         function startGame() {
             const characterSelect = document.getElementById('character');
@@ -562,8 +676,8 @@
             updateColumns();
 
             if (showScore) {
-                ctx.fillStyle = '#8B0000';
-                ctx.font = '24px MedievalSharp';
+                ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#8B0000' : '#b8860b';
+                ctx.font = '24px GFS Didot';
                 ctx.fillText('Score: ' + score, 10, 30);
             }
 
@@ -611,17 +725,8 @@
 
         // Função para alternar o modo Dark
         function toggleDarkMode() {
-            darkMode = document.getElementById('darkCheckbox').checked;
-            const body = document.body;
-            const background = document.getElementById('background');
-
-            if (darkMode) {
-                body.style.backgroundColor = '#000';
-                background.style.backgroundImage = "url('dark-background.jpg')";
-            } else {
-                body.style.backgroundColor = '#FFF';
-                background.style.backgroundImage = "url('background.jpeg')";
-            }
+            const darkCheckbox = document.getElementById('darkCheckbox');
+            document.body.classList.toggle('dark-mode', darkCheckbox.checked);
         }
 
         // Começar com música parada

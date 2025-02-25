@@ -338,8 +338,8 @@
         /* Estilo da checkbox e label */
         #scoreToggle {
             display: flex;
-            align-items: center; /* Alinha horizontalmente */
-            gap: 10px; /* Espaço entre o texto e a checkbox */
+            flex-direction: column;
+            gap: 10px;
             margin-top: 10px;
         }
 
@@ -367,13 +367,14 @@
 
     <!-- Botões no canto superior direito -->
     <div class="button-container">
-        <button id="musicToggle" onclick="toggleMusic()">Música: OFF</button>
         <button id="characterButton" onclick="showCharacterSelection()">Personagem</button>
         <button id="rankingButton" onclick="toggleRanking()">Ranking</button>
         <button id="backgroundButton" onclick="showBackgroundSelection()">Fundos</button>
         <div id="scoreToggle">
             <label for="showScoreCheckbox">Mostrar Score:</label>
             <input type="checkbox" id="showScoreCheckbox" checked onchange="toggleScoreDisplay()">
+            <label for="musicCheckbox">Música:</label>
+            <input type="checkbox" id="musicCheckbox" onchange="toggleMusic()">
         </div>
     </div>
 
@@ -613,17 +614,13 @@
 
         // Função para alternar a música
         function toggleMusic() {
-            const musicButton = document.getElementById('musicToggle');
             const music = document.getElementById('backgroundMusic');
+            const musicCheckbox = document.getElementById('musicCheckbox');
 
-            if (music.paused) {
+            if (musicCheckbox.checked) {
                 music.play();
-                musicButton.textContent = "Música: ON";
-                musicPlaying = true;
             } else {
                 music.pause();
-                musicButton.textContent = "Música: OFF";
-                musicPlaying = false;
             }
         }
 
@@ -670,8 +667,8 @@
 
         // Começar com música parada
         window.onload = () => {
-            document.getElementById('musicToggle').textContent = "Música: OFF";
-            musicPlaying = false;
+            const musicCheckbox = document.getElementById('musicCheckbox');
+            musicCheckbox.checked = false; // Música começa desligada
         };
     </script>
 </body>

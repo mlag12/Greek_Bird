@@ -33,7 +33,9 @@
 
         window.saveScore = async function saveScore(name, score) {
             try {
-                const topScores = await getTopScores();
+                const topScores = await getTopScores(); // Obtenha os 10 melhores scores
+
+                // Verifique se o novo score é maior que o menor no top 10
                 if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
                     await addDoc(collection(db, "scores"), {
                         name: name,
@@ -523,8 +525,6 @@
         birdImage.src = 'socrates.png'; // Personagem inicial
         const columnImage = new Image();
         columnImage.src = 'column.jpeg';
-        const orbImage = new Image();
-        orbImage.src = 'orb.png'; // Imagem do orb
 
         const bird = {
             x: 50,
@@ -545,24 +545,46 @@
         let rankingDisplayed = false;
         let showScore = true;
 
-        // Orb de energia
-        let orb = {
-            x: 0,
-            y: 0,
-            width: 40,
-            height: 40,
-            active: false,
-            collected: false
-        };
+        // Efeitos de morcegos
+        const bats = [];
+        const batImage = new Image();
+        batImage.src = 'bat.png'; // Imagem do morcego
 
-        // Efeito de luz
-        let lightEffect = {
-            active: false,
-            alpha: 0,
-            maxAlpha: 0.5,
-            duration: 1000, // 1 segundo
-            startTime: 0
-        };
+        function createBat(x, y) {
+            for (let i = 0; i < 10; i++) { // Cria vários morcegos
+                bats.push({
+                    x: x + Math.random() * 20 - 10, // Posição aleatória ao redor do personagem
+                    y: y,
+                    size: Math.random() * 20 + 10,
+                    speedX: (Math.random() - 0.5) * 4, // Movimento horizontal aleatório
+                    speedY: (Math.random() - 0.5) * 4,
+                    rotation: Math.random() * Math.PI * 2 // Rotação aleatória
+                });
+            }
+        }
+
+        function drawBat(x, y, size, rotation) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.drawImage(batImage, -size / 2, -size / 2, size, size);
+            ctx.restore();
+        }
+
+        function drawBats() {
+            bats.forEach((bat, index) => {
+                drawBat(bat.x, bat.y, bat.size, bat.rotation);
+
+                // Atualiza a posição do morcego
+                bat.x += bat.speedX;
+                bat.y += bat.speedY;
+
+                // Remove o morcego quando ele sai da tela
+                if (bat.y > canvas.height || bat.y < 0 || bat.x > canvas.width || bat.x < 0) {
+                    bats.splice(index, 1);
+                }
+            });
+        }
 
         function startGame() {
             const characterSelect = document.getElementById('character');
@@ -615,14 +637,6 @@
             if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
                 const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
                 columns.push({ x: canvas.width, gapY });
-
-                // Ativa o orb a cada 15 pontos
-                if (score % 15 === 0 && score !== 0) {
-                    orb.x = columns[columns.length - 1].x + columnWidth / 2 - orb.width / 2;
-                    orb.y = columns[columns.length - 1].gapY + gapHeight / 2 - orb.height / 2;
-                    orb.active = true;
-                    orb.collected = false;
-                }
             }
         }
 
@@ -635,40 +649,6 @@
             }
         }
 
-        function drawOrb() {
-            if (orb.active && !orb.collected) {
-                ctx.drawImage(orbImage, orb.x, orb.y, orb.width, orb.height);
-            }
-        }
-
-        function checkOrbCollision() {
-            if (orb.active && !orb.collected) {
-                if (
-                    bird.x + bird.width > orb.x &&
-                    bird.x < orb.x + orb.width &&
-                    bird.y + bird.height > orb.y &&
-                    bird.y < orb.y + orb.height
-                ) {
-                    orb.collected = true;
-                    lightEffect.active = true;
-                    lightEffect.startTime = Date.now();
-                }
-            }
-        }
-
-        function drawLightEffect() {
-            if (lightEffect.active) {
-                const elapsed = Date.now() - lightEffect.startTime;
-                if (elapsed < lightEffect.duration) {
-                    lightEffect.alpha = lightEffect.maxAlpha * (1 - elapsed / lightEffect.duration);
-                    ctx.fillStyle = `rgba(255, 255, 0, ${lightEffect.alpha})`;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                } else {
-                    lightEffect.active = false;
-                }
-            }
-        }
-
         function restartGame() {
             bird.y = canvas.height / 2;
             bird.velocity = 0;
@@ -676,12 +656,60 @@
             score = 0;
             gameOver = false;
             rankingDisplayed = false;
-            orb.active = false;
-            orb.collected = false;
-            lightEffect.active = false;
             document.getElementById('gameOverText').style.display = 'none';
             document.getElementById('rankingText').style.display = 'none';
             animate();
+        }
+
+        async function displayRanking() {
+            const topScores = await getTopScores();
+            let rankingText = "Top 10 Scores:\n";
+            topScores.forEach((entry, index) => {
+                rankingText += `${index + 1}. ${entry.name}: ${entry.score}\n`;
+            });
+
+            rankingText += `\nSua pontuação: ${score}`;
+            document.getElementById('rankingText').innerText = rankingText;
+
+            rankingDisplayed = true;
+        }
+
+        function toggleRanking() {
+            const rankingText = document.getElementById('rankingText');
+            if (rankingText.style.display === 'none' || rankingText.style.display === '') {
+                displayRanking();
+                rankingText.style.display = 'block';
+            } else {
+                rankingText.style.display = 'none';
+            }
+        }
+
+        async function saveAndDisplayRanking() {
+            const topScores = await getTopScores();
+
+            if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
+                document.getElementById('top10Score').textContent = score;
+                document.getElementById('top10Dialog').style.display = 'block';
+            } else {
+                console.log("Score muito baixo para entrar no top 10.");
+                displayRanking();
+            }
+        }
+
+        async function submitScore() {
+            const playerName = document.getElementById('playerName').value;
+            if (playerName) {
+                try {
+                    await saveScore(playerName, score);
+                    document.getElementById('top10Dialog').style.display = 'none';
+                    displayRanking();
+                } catch (error) {
+                    console.error("Erro ao salvar score:", error);
+                    alert("Ocorreu um erro ao salvar o score. Tente novamente.");
+                }
+            } else {
+                alert("Nome inválido! O score não foi salvo.");
+            }
         }
 
         function animate() {
@@ -689,14 +717,16 @@
             updateBird();
             drawBird();
             updateColumns();
-            drawOrb();
-            checkOrbCollision();
-            drawLightEffect();
 
             if (showScore) {
                 ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#8B0000' : '#b8860b';
                 ctx.font = '24px GFS Didot';
                 ctx.fillText('Score: ' + score, 10, 30);
+            }
+
+            // Desenha os morcegos
+            if (document.body.classList.contains('dark-mode')) {
+                drawBats();
             }
 
             if (!gameOver) {

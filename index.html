@@ -708,7 +708,92 @@
             }
         }
 
-        // Event listeners e funções auxiliares mantidos iguais
+        document.getElementById('startButton').addEventListener('click', () => {
+            if (!gameStarted) {
+                gameStarted = true;
+                document.getElementById('touchToStart').style.display = 'none';
+                restartGame();
+            } else if (gameOver) {
+                restartGame();
+                document.getElementById('touchToStart').style.display = 'none';
+            }
+
+            // Fecha o menu ao clicar em "Start"
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'flex') {
+                buttonContainer.style.display = 'none';
+            }
+        });
+
+        canvas.addEventListener('click', (event) => {
+            bird.velocity = bird.lift;
+            createBat(bird.x + bird.width / 2, bird.y + bird.height); // Morcegos ao pular
+        });
+
+        // Função para alternar a música
+        function toggleMusic() {
+            const music = document.getElementById('backgroundMusic');
+            const musicCheckbox = document.getElementById('musicCheckbox');
+
+            if (musicCheckbox.checked) {
+                music.play();
+            } else {
+                music.pause();
+            }
+        }
+
+        // Função para alternar o modo Dark
+        function toggleDarkMode() {
+            const darkCheckbox = document.getElementById('darkCheckbox');
+            document.body.classList.toggle('dark-mode', darkCheckbox.checked);
+        }
+
+        // Função para alternar a exibição do menu
+        function toggleMenu() {
+            const buttonContainer = document.querySelector('.button-container');
+            if (buttonContainer.style.display === 'none' || buttonContainer.style.display === '') {
+                buttonContainer.style.display = 'flex';
+            } else {
+                buttonContainer.style.display = 'none';
+            }
+        }
+
+        // Função para mostrar a seleção de personagem
+        function showCharacterSelection() {
+            document.getElementById('characterSelection').style.display = 'block';
+        }
+
+        // Função para mostrar a seleção de fundo
+        function showBackgroundSelection() {
+            document.getElementById('backgroundSelection').style.display = 'block';
+            updateBackgroundPreview();
+        }
+
+        // Função para atualizar a prévia do fundo
+        function updateBackgroundPreview() {
+            const backgroundSelect = document.getElementById('backgroundSelect');
+            const backgroundPreview = document.getElementById('backgroundPreview');
+            backgroundPreview.style.backgroundImage = `url('${backgroundSelect.value}')`;
+        }
+
+        // Função para aplicar o fundo selecionado
+        function applyBackground() {
+            const backgroundSelect = document.getElementById('backgroundSelect');
+            const backgroundDiv = document.getElementById('background');
+            backgroundDiv.style.backgroundImage = `url('${backgroundSelect.value}')`;
+            document.getElementById('backgroundSelection').style.display = 'none';
+        }
+
+        // Função para alternar a exibição do score
+        function toggleScoreDisplay() {
+            showScore = document.getElementById('showScoreCheckbox').checked;
+        }
+
+        // Começar com música parada
+        window.onload = () => {
+            const musicCheckbox = document.getElementById('musicCheckbox');
+            musicCheckbox.checked = false; // Música começa desligada
+        };
     </script>
 </body>
 

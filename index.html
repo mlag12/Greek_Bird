@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Owl</title>
+    <title>Greek Bird - Dark Mode</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=GFS+Didot&display=swap');
 
@@ -423,27 +423,51 @@
         body.dark-mode #top10Dialog button:hover {
             background-color: #FF0000;
         }
-
-        .checkbox-container {
-            display: flex;
-            align-items: center;
-            margin: 5px 0;
-            color: #b8860b;
-        }
-
-        body.dark-mode .checkbox-container {
-            color: #8B0000;
-        }
-
-        .checkbox-container input {
-            margin-right: 10px;
-        }
     </style>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, orderBy, query, limit, addDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlaMVBRQlulpV9MbVxasuGblF38KkY5f8",
+            authDomain: "greek-bird.firebaseapp.com",
+            projectId: "greek-bird",
+            storageBucket: "greek-bird.appspot.com",
+            messagingSenderId: "58870766246",
+            appId: "1:58870766246:web:6eb9c796ec11abd0e5f267",
+            measurementId: "G-PZBLWMH5W6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.getTopScores = async function getTopScores() {
+            const scoresRef = collection(db, "scores");
+            const q = query(scoresRef, orderBy("score", "desc"), limit(10));
+            const querySnapshot = await getDocs(q);
+            const topScores = [];
+            querySnapshot.forEach((doc) => {
+                topScores.push(doc.data());
+            });
+            return topScores;
+        }
+
+        window.saveScore = async function saveScore(name, score) {
+            try {
+                await addDoc(collection(db, "scores"), {
+                    name: name,
+                    score: score
+                });
+                console.log("Score saved!");
+            } catch (error) {
+                console.error("Error saving score: ", error);
+            }
+        };
+    </script>
 </head>
 
 <body>
     <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
-    <audio id="owlSound" src="owl_sound.mp3" preload="auto"></audio>
     <div id="background"></div>
     <canvas id="gameCanvas"></canvas>
     <div id="gameOverText">Game Over</div>
@@ -480,7 +504,6 @@
             <option value="kant.png">Kant</option>
             <option value="olavo.png">Olavo</option>       
             <option value="schopenhauer.png">Schopenhauer</option>
-            <option value="deleuze.png">Deleuze</option>
         </select>
         <button onclick="startGame()">Jogar</button>
     </div>
@@ -512,10 +535,6 @@
         birdImage.src = 'socrates.png';
         const columnImage = new Image();
         columnImage.src = 'column.jpeg';
-        const owlImage = new Image();
-        owlImage.src = 'owl.png'; // Imagem da coruja
-        const bloodImage = new Image();
-        bloodImage.src = 'blood.png'; // Imagem para o efeito de sangramento
 
         const bird = {
             x: 50,
@@ -535,33 +554,21 @@
         let gameStarted = false;
         let rankingDisplayed = false;
         let showScore = true;
-        let lastColumnPassed = false;
-        let owlActive = false;
-        let owl = {
-            x: 0,
-            y: 0,
-            width: 60,
-            height: 60,
-            speedX: 0,
-            speedY: 0,
-            visible: false
-        };
-        let bloodParticles = [];
 
         // Efeitos de morcegos
         const bats = [];
         const batImage = new Image();
-        batImage.src = 'bat.png';
+        batImage.src = 'bat.png'; // Imagem do morcego
 
         function createBat(x, y) {
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 10; i++) { // Cria vários morcegos
                 bats.push({
-                    x: x + Math.random() * 20 - 10,
+                    x: x + Math.random() * 20 - 10, // Posição aleatória ao redor do personagem
                     y: y,
                     size: Math.random() * 20 + 10,
-                    speedX: (Math.random() - 0.5) * 4,
+                    speedX: (Math.random() - 0.5) * 4, // Movimento horizontal aleatório
                     speedY: (Math.random() - 0.5) * 4,
-                    rotation: Math.random() * Math.PI * 2
+                    rotation: Math.random() * Math.PI * 2 // Rotação aleatória
                 });
             }
         }
@@ -577,86 +584,16 @@
         function drawBats() {
             bats.forEach((bat, index) => {
                 drawBat(bat.x, bat.y, bat.size, bat.rotation);
+
+                // Atualiza a posição do morcego
                 bat.x += bat.speedX;
                 bat.y += bat.speedY;
 
+                // Remove o morcego quando ele sai da tela
                 if (bat.y > canvas.height || bat.y < 0 || bat.x > canvas.width || bat.x < 0) {
                     bats.splice(index, 1);
                 }
             });
-        }
-
-        function createBloodParticles(x, y, count) {
-            for (let i = 0; i < count; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 3 + 1;
-                bloodParticles.push({
-                    x: x,
-                    y: y,
-                    size: Math.random() * 10 + 5,
-                    speedX: Math.cos(angle) * speed,
-                    speedY: Math.sin(angle) * speed,
-                    life: 100,
-                    decay: Math.random() * 0.5 + 0.5
-                });
-            }
-        }
-
-        function updateBloodParticles() {
-            for (let i = bloodParticles.length - 1; i >= 0; i--) {
-                const p = bloodParticles[i];
-                p.x += p.speedX;
-                p.y += p.speedY;
-                p.life -= p.decay;
-                
-                if (p.life <= 0) {
-                    bloodParticles.splice(i, 1);
-                }
-            }
-        }
-
-        function drawBloodParticles() {
-            bloodParticles.forEach(p => {
-                const opacity = p.life / 100;
-                ctx.globalAlpha = opacity;
-                ctx.drawImage(bloodImage, p.x - p.size/2, p.y - p.size/2, p.size, p.size);
-                ctx.globalAlpha = 1;
-            });
-        }
-
-        function spawnOwl(column) {
-            owl.x = column.x + columnWidth/2 - owl.width/2;
-            owl.y = column.gapY + gapHeight/2 - owl.height/2;
-            owl.visible = true;
-            owlActive = true;
-            
-            // Define a direção de voo aleatória da coruja
-            const angle = Math.random() * Math.PI/2 - Math.PI/4; // -45 a 45 graus
-            const speed = 5;
-            owl.speedX = Math.cos(angle) * speed;
-            owl.speedY = Math.sin(angle) * speed;
-            
-            // Toca o som da coruja
-            document.getElementById('owlSound').play();
-        }
-
-        function updateOwl() {
-            if (!owl.visible) return;
-            
-            owl.x += owl.speedX;
-            owl.y += owl.speedY;
-            
-            // Remove a coruja quando ela sai da tela
-            if (owl.x > canvas.width || owl.x + owl.width < 0 || 
-                owl.y > canvas.height || owl.y + owl.height < 0) {
-                owl.visible = false;
-                owlActive = false;
-            }
-        }
-
-        function drawOwl() {
-            if (!owl.visible) return;
-            ctx.drawImage(owlImage, owl.x, owl.y, owl.width, owl.height);
         }
 
         function startGame() {
@@ -680,69 +617,34 @@
         }
 
         function drawColumn(column) {
-            // Coluna inferior
             ctx.drawImage(columnImage, column.x, column.gapY + gapHeight, columnWidth, canvas.height - column.gapY - gapHeight);
-            
-            // Coluna superior (invertida)
             ctx.save();
             ctx.scale(1, -1);
             ctx.drawImage(columnImage, column.x, -column.gapY, columnWidth, column.gapY);
             ctx.restore();
-            
-            // Efeito de sangramento nas colunas
-            if (document.body.classList.contains('dark-mode')) {
-                // Sangue escorrendo da coluna superior
-                ctx.drawImage(bloodImage, column.x, column.gapY, columnWidth, 20);
-                
-                // Sangue escorrendo da coluna inferior
-                ctx.drawImage(bloodImage, column.x, column.gapY + gapHeight - 20, columnWidth, 20);
-            }
         }
 
         function updateColumns() {
             for (let i = columns.length - 1; i >= 0; i--) {
                 const column = columns[i];
                 column.x -= 3;
-                
-                // Verifica se o pássaro passou pelo meio da coluna
-                if (!column.passed && bird.x > column.x + columnWidth) {
-                    column.passed = true;
-                    score++;
-                    
-                    // Chance de 30% de spawnar uma coruja
-                    if (!owlActive && Math.random() < 0.3) {
-                        spawnOwl(column);
-                    }
-                }
-                
-                // Remove colunas que saíram da tela
                 if (column.x + columnWidth < 0) {
                     columns.splice(i, 1);
+                    score++;
                 }
-                
                 drawColumn(column);
-                
-                // Verifica colisão com as colunas
                 if (
                     bird.x + bird.width > column.x &&
                     bird.x < column.x + columnWidth &&
                     (bird.y < column.gapY || bird.y + bird.height > column.gapY + gapHeight)
                 ) {
-                    // Cria partículas de sangue no ponto de colisão
-                    const collisionY = bird.y < column.gapY ? column.gapY : column.gapY + gapHeight;
-                    createBloodParticles(column.x + columnWidth/2, collisionY, 20);
                     gameOver = true;
                 }
             }
 
-            // Adiciona novas colunas quando necessário
             if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
                 const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
-                columns.push({ 
-                    x: canvas.width, 
-                    gapY,
-                    passed: false
-                });
+                columns.push({ x: canvas.width, gapY });
             }
         }
 
@@ -762,22 +664,13 @@
             score = 0;
             gameOver = false;
             rankingDisplayed = false;
-            owl.visible = false;
-            owlActive = false;
-            bloodParticles = [];
             document.getElementById('gameOverText').style.display = 'none';
             document.getElementById('rankingText').style.display = 'none';
             animate();
         }
 
         async function displayRanking() {
-            // Simulação de ranking local (substitua por sua implementação real)
-            const topScores = [
-                { name: "Jogador 1", score: 100 },
-                { name: "Jogador 2", score: 80 },
-                { name: "Jogador 3", score: 70 }
-            ];
-            
+            const topScores = await getTopScores();
             let rankingText = "Top 10 Scores:\n";
             topScores.forEach((entry, index) => {
                 rankingText += `${index + 1}. ${entry.name}: ${entry.score}\n`;
@@ -800,12 +693,7 @@
         }
 
         async function saveAndDisplayRanking() {
-            // Simulação de salvamento de score (substitua por sua implementação real)
-            const topScores = [
-                { name: "Jogador 1", score: 100 },
-                { name: "Jogador 2", score: 80 },
-                { name: "Jogador 3", score: 70 }
-            ];
+            const topScores = await getTopScores();
 
             if (topScores.length < 10 || score > topScores[topScores.length - 1].score) {
                 document.getElementById('top10Score').textContent = score;
@@ -820,8 +708,7 @@
             const playerName = document.getElementById('playerName').value;
             if (playerName) {
                 try {
-                    // Simulação de salvamento (substitua por sua implementação real)
-                    console.log(`Score salvo: ${playerName} - ${score}`);
+                    await saveScore(playerName, score);
                     document.getElementById('top10Dialog').style.display = 'none';
                     displayRanking();
                 } catch (error) {
@@ -838,10 +725,6 @@
             updateBird();
             drawBird();
             updateColumns();
-            updateOwl();
-            drawOwl();
-            updateBloodParticles();
-            drawBloodParticles();
 
             if (showScore) {
                 ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#8B0000' : '#b8860b';
@@ -849,6 +732,7 @@
                 ctx.fillText('Score: ' + score, 10, 30);
             }
 
+            // Desenha os morcegos apenas no modo escuro
             if (document.body.classList.contains('dark-mode')) {
                 drawBats();
             }
@@ -880,7 +764,7 @@
 
         canvas.addEventListener('click', (event) => {
             bird.velocity = bird.lift;
-            createBat(bird.x + bird.width / 2, bird.y + bird.height);
+            createBat(bird.x + bird.width / 2, bird.y + bird.height); // Morcegos ao pular
         });
 
         function toggleMusic() {

@@ -556,6 +556,8 @@
         const bloodDrops = [];
         const columnWidth = 60;
         const gapHeight = 300;
+        const maxColumnHeight = canvas.height * 0.6; // Limita a altura máxima das colunas
+        const minColumnHeight = canvas.height * 0.2; // Altura mínima das colunas
         let score = 0;
         let gameOver = false;
         let gameStarted = false;
@@ -598,35 +600,40 @@
             });
         }
 
-        function spawnOwl() {
-            if (columns.length > 0) {
-                const column = columns[0];
-                owl = {
-                    x: column.x + columnWidth/2 - 30,
-                    y: column.gapY + gapHeight/2 - 20,
-                    width: 60,
-                    height: 40,
-                    speed: 5,
-                    direction: -1, // -1 for left, 1 for right
-                    visible: true
-                };
-                
-                // Play owl sound
-                const owlSound = document.getElementById('owlSound');
-                owlSound.currentTime = 0;
-                owlSound.play();
-            }
+        function spawnOwl(column) {
+            owl = {
+                x: column.x + columnWidth/2 - 30,
+                y: column.gapY + gapHeight - 40, // Pousado na coluna inferior
+                width: 60,
+                height: 40,
+                speed: 5,
+                direction: -1, // -1 for left, 1 for right
+                visible: true,
+                state: 'perched', // 'perched' or 'flying'
+                takeoffTimer: 60 // Frames before taking off
+            };
         }
 
         function updateOwl() {
             if (!owl) return;
             
-            owl.x += owl.speed * owl.direction;
-            
-            // Remove owl if off screen
-            if ((owl.direction === -1 && owl.x + owl.width < 0) || 
-                (owl.direction === 1 && owl.x > canvas.width)) {
-                owl = null;
+            if (owl.state === 'perched') {
+                owl.takeoffTimer--;
+                if (owl.takeoffTimer <= 0) {
+                    owl.state = 'flying';
+                    // Play owl sound when taking off
+                    const owlSound = document.getElementById('owlSound');
+                    owlSound.currentTime = 0;
+                    owlSound.play();
+                }
+            } else if (owl.state === 'flying') {
+                owl.x += owl.speed * owl.direction;
+                
+                // Remove owl if off screen
+                if ((owl.direction === -1 && owl.x + owl.width < 0) || 
+                    (owl.direction === 1 && owl.x > canvas.width)) {
+                    owl = null;
+                }
             }
         }
 
@@ -635,7 +642,7 @@
             
             ctx.save();
             // Flip owl if going left
-            if (owl.direction === -1) {
+            if (owl.state === 'flying' && owl.direction === -1) {
                 ctx.translate(owl.x + owl.width, owl.y);
                 ctx.scale(-1, 1);
                 ctx.drawImage(owlImage, 0, 0, owl.width, owl.height);
@@ -702,12 +709,13 @@
             }
 
             if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
-                const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
-                columns.push({ x: canvas.width, gapY });
+                const gapY = Math.random() * (maxColumnHeight - minColumnHeight) + minColumnHeight;
+                const newColumn = { x: canvas.width, gapY };
+                columns.push(newColumn);
                 
                 // Occasionally spawn owl when new column is created
                 if (Math.random() < 0.3 && !owl) {
-                    spawnOwl();
+                    spawnOwl(newColumn);
                 }
             }
         }

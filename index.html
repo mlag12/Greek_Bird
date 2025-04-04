@@ -468,7 +468,6 @@
 
 <body>
     <audio id="backgroundMusic" src="Zorbas_Dance.mp3" loop></audio>
-    <audio id="owlSound" src="owl_sound.mp3" preload="auto"></audio>
     <div id="background"></div>
     <canvas id="gameCanvas"></canvas>
     <div id="gameOverText">Game Over</div>
@@ -537,10 +536,6 @@
         birdImage.src = 'socrates.png';
         const columnImage = new Image();
         columnImage.src = 'column.jpeg';
-        const bloodImage = new Image();
-        bloodImage.src = 'blood.png';
-        const owlImage = new Image();
-        owlImage.src = 'owl.png';
 
         const bird = {
             x: 50,
@@ -553,103 +548,53 @@
         };
 
         const columns = [];
-        const bloodDrops = [];
         const columnWidth = 60;
         const gapHeight = 300;
-        const maxColumnHeight = canvas.height * 0.6; // Limita a altura máxima das colunas
-        const minColumnHeight = canvas.height * 0.2; // Altura mínima das colunas
         let score = 0;
         let gameOver = false;
         let gameStarted = false;
         let rankingDisplayed = false;
         let showScore = true;
-        let owl = null;
-        let owlTimer = 0;
-        const owlInterval = 300; // Frames between owl appearances
 
-        function createBloodDrops(x, y, count) {
-            for (let i = 0; i < count; i++) {
-                bloodDrops.push({
-                    x: x + Math.random() * columnWidth,
+        // Efeitos de morcegos
+        const bats = [];
+        const batImage = new Image();
+        batImage.src = 'bat.png'; // Imagem do morcego
+
+        function createBat(x, y) {
+            for (let i = 0; i < 10; i++) { // Cria vários morcegos
+                bats.push({
+                    x: x + Math.random() * 20 - 10, // Posição aleatória ao redor do personagem
                     y: y,
-                    speed: 1 + Math.random() * 3,
-                    size: 5 + Math.random() * 10,
-                    alpha: 0.7 + Math.random() * 0.3
+                    size: Math.random() * 20 + 10,
+                    speedX: (Math.random() - 0.5) * 4, // Movimento horizontal aleatório
+                    speedY: (Math.random() - 0.5) * 4,
+                    rotation: Math.random() * Math.PI * 2 // Rotação aleatória
                 });
             }
         }
 
-        function updateBloodDrops() {
-            for (let i = bloodDrops.length - 1; i >= 0; i--) {
-                const drop = bloodDrops[i];
-                drop.y += drop.speed;
-                
-                // Remove if off screen
-                if (drop.y > canvas.height) {
-                    bloodDrops.splice(i, 1);
-                }
-            }
-        }
-
-        function drawBloodDrops() {
-            bloodDrops.forEach(drop => {
-                ctx.save();
-                ctx.globalAlpha = drop.alpha;
-                ctx.drawImage(bloodImage, drop.x, drop.y, drop.size, drop.size);
-                ctx.restore();
-            });
-        }
-
-        function spawnOwl(column) {
-            owl = {
-                x: column.x + columnWidth/2 - 30,
-                y: column.gapY + gapHeight - 40, // Pousado na coluna inferior
-                width: 60,
-                height: 40,
-                speed: 5,
-                direction: -1, // -1 for left, 1 for right
-                visible: true,
-                state: 'perched', // 'perched' or 'flying'
-                takeoffTimer: 60 // Frames before taking off
-            };
-        }
-
-        function updateOwl() {
-            if (!owl) return;
-            
-            if (owl.state === 'perched') {
-                owl.takeoffTimer--;
-                if (owl.takeoffTimer <= 0) {
-                    owl.state = 'flying';
-                    // Play owl sound when taking off
-                    const owlSound = document.getElementById('owlSound');
-                    owlSound.currentTime = 0;
-                    owlSound.play();
-                }
-            } else if (owl.state === 'flying') {
-                owl.x += owl.speed * owl.direction;
-                
-                // Remove owl if off screen
-                if ((owl.direction === -1 && owl.x + owl.width < 0) || 
-                    (owl.direction === 1 && owl.x > canvas.width)) {
-                    owl = null;
-                }
-            }
-        }
-
-        function drawOwl() {
-            if (!owl || !owl.visible) return;
-            
+        function drawBat(x, y, size, rotation) {
             ctx.save();
-            // Flip owl if going left
-            if (owl.state === 'flying' && owl.direction === -1) {
-                ctx.translate(owl.x + owl.width, owl.y);
-                ctx.scale(-1, 1);
-                ctx.drawImage(owlImage, 0, 0, owl.width, owl.height);
-            } else {
-                ctx.drawImage(owlImage, owl.x, owl.y, owl.width, owl.height);
-            }
+            ctx.translate(x, y);
+            ctx.rotate(rotation);
+            ctx.drawImage(batImage, -size / 2, -size / 2, size, size);
             ctx.restore();
+        }
+
+        function drawBats() {
+            bats.forEach((bat, index) => {
+                drawBat(bat.x, bat.y, bat.size, bat.rotation);
+
+                // Atualiza a posição do morcego
+                bat.x += bat.speedX;
+                bat.y += bat.speedY;
+
+                // Remove o morcego quando ele sai da tela
+                if (bat.y > canvas.height || bat.y < 0 || bat.x > canvas.width || bat.x < 0) {
+                    bats.splice(index, 1);
+                }
+            });
         }
 
         function startGame() {
@@ -673,19 +618,11 @@
         }
 
         function drawColumn(column) {
-            // Draw top column (flipped)
+            ctx.drawImage(columnImage, column.x, column.gapY + gapHeight, columnWidth, canvas.height - column.gapY - gapHeight);
             ctx.save();
             ctx.scale(1, -1);
             ctx.drawImage(columnImage, column.x, -column.gapY, columnWidth, column.gapY);
             ctx.restore();
-            
-            // Draw bottom column
-            ctx.drawImage(columnImage, column.x, column.gapY + gapHeight, columnWidth, canvas.height - column.gapY - gapHeight);
-            
-            // Create blood drops from top column occasionally
-            if (Math.random() < 0.02) {
-                createBloodDrops(column.x, column.gapY, 3 + Math.floor(Math.random() * 5));
-            }
         }
 
         function updateColumns() {
@@ -703,20 +640,12 @@
                     (bird.y < column.gapY || bird.y + bird.height > column.gapY + gapHeight)
                 ) {
                     gameOver = true;
-                    // Create blood on collision
-                    createBloodDrops(column.x, bird.y, 10);
                 }
             }
 
             if (columns.length === 0 || columns[columns.length - 1].x < canvas.width - 330) {
-                const gapY = Math.random() * (maxColumnHeight - minColumnHeight) + minColumnHeight;
-                const newColumn = { x: canvas.width, gapY };
-                columns.push(newColumn);
-                
-                // Occasionally spawn owl when new column is created
-                if (Math.random() < 0.3 && !owl) {
-                    spawnOwl(newColumn);
-                }
+                const gapY = Math.random() * (canvas.height - gapHeight - 100) + 50;
+                columns.push({ x: canvas.width, gapY });
             }
         }
 
@@ -726,8 +655,6 @@
 
             if (bird.y + bird.height > canvas.height || bird.y < 0) {
                 gameOver = true;
-                // Create blood when hitting ground/ceiling
-                createBloodDrops(bird.x, bird.y, 10);
             }
         }
 
@@ -735,8 +662,6 @@
             bird.y = canvas.height / 2;
             bird.velocity = 0;
             columns.length = 0;
-            bloodDrops.length = 0;
-            owl = null;
             score = 0;
             gameOver = false;
             rankingDisplayed = false;
@@ -801,15 +726,16 @@
             updateBird();
             drawBird();
             updateColumns();
-            updateBloodDrops();
-            drawBloodDrops();
-            updateOwl();
-            drawOwl();
 
             if (showScore) {
                 ctx.fillStyle = document.body.classList.contains('dark-mode') ? '#8B0000' : '#b8860b';
                 ctx.font = '24px GFS Didot';
                 ctx.fillText('Score: ' + score, 10, 30);
+            }
+
+            // Desenha os morcegos apenas no modo escuro
+            if (document.body.classList.contains('dark-mode')) {
+                drawBats();
             }
 
             if (!gameOver) {
@@ -839,6 +765,7 @@
 
         canvas.addEventListener('click', (event) => {
             bird.velocity = bird.lift;
+            createBat(bird.x + bird.width / 2, bird.y + bird.height); // Morcegos ao pular
         });
 
         function toggleMusic() {
